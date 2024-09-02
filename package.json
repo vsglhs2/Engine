@@ -1,0 +1,40 @@
+{
+  "name": "engine",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react-swc": "^3.7.0",
+    "sass": "^1.77.8",
+    "typescript": "^5.4.1-rc",
+    "vite": "^5.1.0"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@fontsource-variable/inter": "^5.0.20",
+    "@mui/joy": "^5.0.0-beta.48",
+    "classnames": "^2.5.1",
+    "flexlayout-react": "^0.7.15",
+    "lodash": "^4.17.21",
+    "mobx": "^6.13.1",
+    "mobx-react-lite": "^4.0.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.1",
+    "reset-css": "^5.0.2"
+  },
+  "overrides": {
+    "vite": {
+      "esbuild": "0.21.4"
+    }
+  }
+}
