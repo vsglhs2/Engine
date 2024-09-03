@@ -1,5 +1,6 @@
 import { FunctionComponent } from "react";
 import { LayoutColumn, LayoutRow } from "./types";
+import { Project } from "@/engine/project";
 
 // THINK: maybe move it to utils ?
 // TODO: do better with types
@@ -21,8 +22,14 @@ export function row(...args: RowArgs): LayoutRow {
     };
 }
 
-export function col(component: FunctionComponent, width = 1, options = {}): LayoutColumn {
+export function col(
+    name: string,
+    component: FunctionComponent<Record<string, unknown>>, 
+    width = 1,
+    options = {}
+): LayoutColumn {
     return {
+        name,
         component,
         width,
     };

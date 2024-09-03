@@ -2,6 +2,7 @@ import { FunctionComponent } from "react";
 
 export type LayoutColumn = {
     component: FunctionComponent<Record<string, unknown>>;
+    name: string;
     width: number;
 };
 

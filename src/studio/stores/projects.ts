@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { autorun, makeAutoObservable } from "mobx";
 import { Project } from "../../engine/project/project";
 import { project } from "../../sample-game/main";
 
@@ -21,7 +21,7 @@ export class ProjectsStore {
         if (project.name in this.projectsRecord)
             throw new Error(`There is already project with [${project.name}] name`);
 
-        this.projectsRecord[project.name] = project;
+        this.projectsRecord[project.name] = makeAutoObservable(project);
     }
 
     activate(name: string) {

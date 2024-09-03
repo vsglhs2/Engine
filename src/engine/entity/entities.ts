@@ -1,8 +1,7 @@
 import Entity from "./entity";
 
 export class Entities {
-    public readonly entities = new Map<Entity, true>();
-    public readonly root = new Map<Entity, true>();
+    public entities = new Map<Entity, true>();
 
     add(entity: Entity) {
         this.entities.set(entity, true);
@@ -12,16 +11,12 @@ export class Entities {
         this.entities.delete(entity);
     }
 
-    clear() {
-        this.entities.clear();
-        this.root.clear();
-    }
+    destroy() {
+        const entities = this.entities.keys();
+        for (const entity of entities) {
+            entity.destroy();
+        }
 
-    public destroy() {
-        const entities = Array.from(this.entities.keys());
-        entities.forEach(entity => entity.destroy());
+        this.entities.clear();
     }
 }
-
-const entities = new Entities();
-export default entities;

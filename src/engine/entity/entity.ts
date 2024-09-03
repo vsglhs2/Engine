@@ -1,21 +1,34 @@
 import { Captured } from "../controller/base";
 import { Decorate, Decorator, injectable, Mark } from "../decorators";
 import { Entities } from "./entities";
+import { root, RootEntity, RootSymbol } from "./root";
 
-export const EntitiesSymbol = Symbol('Entities');
+export const EntitiesSymbol = Symbol('Entities Symbol');
 export function entities(entity: Entity) {
     return entity[EntitiesSymbol];
+}
+
+export interface IEntity {
+    parent: IEntity | undefined;
+    children: IEntity[];
+}
+
+export interface IRootEntity extends IEntity {
+    parent: undefined;
+    children: Entity[];
 }
 
 @Decorate({
     expose: true,
     // @ts-expect-error FIXME somehow get rid of using callback ?
     parent: injectable(() => [Entity], true),
-    [EntitiesSymbol]: injectable(Entities)
+    [EntitiesSymbol]: injectable(Entities),
+    [RootSymbol]: injectable(RootEntity),
 })
-export default abstract class Entity extends Decorator(EventTarget) {
+export default abstract class Entity extends Decorator(EventTarget) implements IEntity {
     // @Injectable(Entities, { optional: false })
 	declare [EntitiesSymbol]: Entities;
+    declare [RootSymbol]: RootEntity;
     declare private _parent?: Entity;
     children: Mark<Entity[]>;
 
@@ -39,7 +52,10 @@ export default abstract class Entity extends Decorator(EventTarget) {
         entities(this).add(this);
 
         if (!this.parent) {
-            entities(this).root.set(this, true);
+            root(this).add(this);
+
+            // TODO: reconsider
+            // this.parent = root as Entity;
             return;
         }
     }
@@ -50,7 +66,14 @@ export default abstract class Entity extends Decorator(EventTarget) {
         for (const child of this.children) {
             child.destroy();
         }
+
+        this._parent = undefined;
+        this.children.length = 0;
     }
 
     public update(delta: number, captured: Captured): void {}
+
+    static [Symbol.toStringTag]() {
+        return this.name;
+    }
 }

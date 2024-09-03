@@ -26,7 +26,7 @@ export const Studio: FC = observer(() => {
     return (
         <>
             <TopBar />
-            { project && <Layout config={config} project={project} /> }
+            { project && <Layout config={config} /> }
         </>
     )
 });

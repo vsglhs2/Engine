@@ -1,3 +1,4 @@
+export { Telescope } from "./Telescope";
 export { Layout } from "./Layout";
 export { TopBar } from "./TopBar";
 export { Canvas } from "./Canvas";

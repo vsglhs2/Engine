@@ -1,0 +1,12 @@
+.telescope-modal {
+    top: auto;
+    left: auto;
+
+    max-width: 300px;
+    width: 100%;
+    height: fit-content;
+}
+
+.telescope-modal > .telescope-input {
+    box-shadow: -1px 4px 12px 0px rgba(0, 0, 0, .3);
+}

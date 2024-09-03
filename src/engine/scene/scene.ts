@@ -4,26 +4,26 @@ import { Realm, Realms } from "../realm";
 // Может быть, стоит сделать сцену как прокси
 export class Scene<Env extends Environment = Environment> {
     public name: string;
-    public realm: Realm;
+    public realm!: Realm;
     public environment!: Env;
-    private loader: () => Promise<void>;
+    private loader: () => void;
     
-    constructor (name: string, load?: (this: Scene<Env>) => Promise<void>) {
+    constructor (name: string, load?: (this: Scene<Env>) => void) {
         this.name = name;
-        this.realm = new Realm();
-        Realms.push(this.realm);
 
-        const loader = load ? load : async () => {};
+        const loader = load ? load : () => {};
         this.loader = loader.bind(this);
     }
 
-    public async load() {
+    public load(realm = new Realm()) {
         if (!this.environment) throw new Error('Can\'t load scene without environment');
-
+        
+        this.realm = realm;
+        Realms.push(this.realm);
         return this.loader();
     }
 
-    public async reload() {
+    public reload() {
         this.destroy();
         return this.load();
     }

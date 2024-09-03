@@ -1,3 +1,4 @@
+import { RootSymbol } from "@/engine/entity/root";
 import Collider from "../engine/base/collider/base";
 import SimpleCollider from "../engine/base/collider/square/simple";
 import Placeable from "../engine/base/placeable/base";
@@ -104,6 +105,13 @@ class Player extends Square {
             color: "#ff00ff",      
         });
 
+        make(Wall, {
+            position: new Point(100, 100),
+            size: new Size(10, 10),
+            parent: this,      
+            color: "#ff00ff",      
+        });
+
         this.collider = make(SimpleCollider, {
             parent: this,            
         });
@@ -169,8 +177,8 @@ class Player extends Square {
     }
 }
 
-const scene = new Scene<FullscreenEnvironment>('hello scene', async function() {
-    const { InjectContext, Entities } = this.realm;
+const scene = new Scene<FullscreenEnvironment>('hello scene', function() {
+    const { InjectContext, Entities, Root } = this.realm;
 
     // TODO: Вынести взаимодействия с env'ом
     const { CanvasRenderer, UIRenderer } = this.environment;
@@ -183,6 +191,7 @@ const scene = new Scene<FullscreenEnvironment>('hello scene', async function() {
     InjectContext.set(Canvas2dRenderable, RendererSymbol, CanvasRenderer);
     InjectContext.set(HTMLRenderable, RendererSymbol, UIRenderer);
     InjectContext.set(Entity, EntitiesSymbol, Entities);
+    InjectContext.set(Entity, RootSymbol, Root);
     InjectContext.set(Square, 'color', "#ff0000");
 
     make(Menu, {

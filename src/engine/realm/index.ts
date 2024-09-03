@@ -2,6 +2,7 @@
 import InjectContext, { InjectStack } from "../decorators/inject-context";
 import Serializer from "../decorators/serializer";
 import { Entities } from "../entity/entities";
+import { RootEntity } from "../entity/root";
 
 export class Realms {
     private static stack: Realm[] = [];
@@ -26,6 +27,7 @@ export class Realm {
     public InjectContext: InjectContext;
     public InjectStack: InjectStack;
     public Entities: Entities;
+    public Root: RootEntity;
     // TODO: решить, нужен ли local Serializer, или достаточно global
     public Serializer: Serializer;
 
@@ -33,6 +35,7 @@ export class Realm {
         this.InjectContext = new InjectContext();
         this.InjectStack = new InjectStack();
         this.Entities = new Entities();
+        this.Root = new RootEntity();
         this.Serializer = new Serializer();
     }
 
@@ -41,6 +44,7 @@ export class Realm {
         this.InjectStack.clear();
         this.Serializer.clear();
         this.Entities.destroy();
+        this.Root.destroy();
     }
 }
 

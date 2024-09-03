@@ -1,0 +1,51 @@
+import { FC, useMemo } from "react";
+import { EntityTree } from "./EntityTree";
+import { AccordionGroup } from "@mui/joy";
+import { WithContextMenu } from "@/studio/ui";
+import { menuItem } from "@/studio/utils";
+import { telescope } from "@/studio/stores";
+import { useSerializer } from "@/studio/hooks";
+import make from "@/engine/entity/make";
+import { EntityDerived } from "@/engine/decorators";
+import './Tree.Module.scss';
+import { RootEntity } from "@/engine/entity/root";
+
+type RootTreeProps = {
+    root: RootEntity;
+};
+
+export const RootTree: FC<RootTreeProps> = ({ root }) => { 
+    const { exposedKeys, getExposedConstructor } = useSerializer();
+    
+    const trees = root.children.map((entity, i) =>
+        <EntityTree
+            key={entity.constructor.name + i}
+            entity={entity}
+        />
+    );
+    const menuItems = useMemo(() => [
+        menuItem('Create new entity', async () => {
+            const response = await telescope.request({ 
+                options: exposedKeys,
+                require: true,
+            });
+
+            if (response.type === 'closed') return;
+            const { option: key } = response;
+
+            const Constructor = getExposedConstructor(key);
+            // FIXME fix type
+            const object = make(Constructor as EntityDerived);
+            console.log('Created', key, object);
+        })
+    ], []);
+
+    return (
+        <WithContextMenu className="root-tree" items={menuItems}>
+            <AccordionGroup style={{ overflowX: 'hidden' }}>
+                {trees}
+            </AccordionGroup>            
+        </WithContextMenu>
+
+    )
+} 
