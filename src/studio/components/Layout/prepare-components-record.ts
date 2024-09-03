@@ -1,8 +1,10 @@
 import { FunctionComponent } from "react";
-import { TableConfig } from "./types";
+import { LayoutConfig } from "./types";
+import { Project } from "@/engine/project";
 
-export function prepareComponentsRecord(...rawConfig: TableConfig) {
-    return rawConfig.reduce<Record<string, FunctionComponent>>((record, row) => {
+export function prepareComponentsRecord(...rawConfig: LayoutConfig) {
+    type ComponentsRecord = Record<string, FunctionComponent<{ project: Project }>>;
+    return rawConfig.reduce<ComponentsRecord>((record, row) => {
         row.columns.forEach(({ component }) => record[component.name] = component);
 
         return record;

@@ -26,6 +26,7 @@ export class Realm {
     public InjectContext: InjectContext;
     public InjectStack: InjectStack;
     public Entities: Entities;
+    // TODO: решить, нужен ли local Serializer, или достаточно global
     public Serializer: Serializer;
 
     constructor() {
@@ -43,6 +44,10 @@ export class Realm {
     }
 }
 
+// TODO: убрать
+declare global {
+    var Realms: Realms;
+}
 window.Realms = Realms;
 
 // Содержит в себе инстансы глобальных классов по типу Entities

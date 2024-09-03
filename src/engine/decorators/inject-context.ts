@@ -34,6 +34,8 @@ export const DecoratorSymbol = Symbol('Decorator symbol');
 type InjectContextKeys = typeof DecoratorSymbol;
 
 export default class InjectContext {
+    public static global: InjectContext = new InjectContext();
+
     private map: Map<
         DecoratorConstructor, 
         Record<string, unknown | (() => unknown)>

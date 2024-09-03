@@ -2,7 +2,8 @@ import Square from "../base/renderables/square/base";
 import Entity from "../entity/entity";
 import { Brand, Flavor, IsBranded, IsFlavored } from "../entity/flavor";
 import { Realms } from "../realm";
-import { DecoratorSymbol } from "./inject-context";
+import InjectContext, { DecoratorSymbol } from "./inject-context";
+import Serializer from "./serializer";
 import { mapPrototypeChain } from "./utils/prototype";
 
 // TODO: абстрагировать decorate от entity - сделать основой DecoratorBase
@@ -293,11 +294,11 @@ export const Decorator = <Constructor extends AnyConstructor> (Constructor: Cons
     abstract class Decorator extends Constructor {
         constructor (...args: any[]) {
             super(...args);
-            const { InjectStack, InjectContext } = Realms.active();
+            const { InjectStack } = Realms.active();
             
             const mappedValues = mapPrototypeChain(
                 this.constructor as unknown as BrandedDecorator,
-                constructor => InjectContext.get(constructor, DecoratorSymbol)
+                constructor => InjectContext.global.get(constructor, DecoratorSymbol)
             );
 
             const fromContext: Record<string | symbol, unknown> = {};
@@ -354,7 +355,7 @@ export const Decorate = <
     context: ClassDecoratorContext<Constructor>
 ) => {
     const input = normalizeInput(decorateInput as Input);  
-    const { InjectContext } = Realms.active();
+    const { global } = InjectContext;
 
     if (input.expose && context.name) prepareExposable(Constructor, { as: context.name });
     if (input.expose && !context.name) throw new Error('Cannot expose unnamed class');
@@ -384,7 +385,7 @@ export const Decorate = <
         );
     }
 
-    InjectContext.set(Constructor, DecoratorSymbol, decorators);
+    global.set(Constructor, DecoratorSymbol, decorators);
 
     return Constructor;
 };
@@ -443,13 +444,12 @@ export function prepareInjection<
     key: any,
     options: Options
 ) {
-    const { InjectContext } = Realms.active();
     // @ts-expect-error FIXME Hack to determine that type is passed through callback
     // TODO: move it to normalizeInput
     const constructor: AnyConstructor = typeof Value.prototype === 'object' ? Value : Value()[0];
 
     const fromContext = (Target: DecoratorConstructor) => {
-        // FIXME fix type
+        const { InjectContext } = Realms.active();
         return InjectContext.get(Target, key);           
     };
 
@@ -489,9 +489,8 @@ export function prepareSerialization<
     // @ts-expect-error FIXME Hack to determine that type is passed through callback
     // TODO: move it to normalizeInput
     const constructor: AnyConstructor = typeof Value.prototype === 'object' ? Value : Value()[0];
-    const { Serializer } = Realms.active();
 
-    Serializer.addSerializable(Target, key, constructor);
+    Serializer.global.addSerializable(Target, key, constructor);
 }
 
 export type EntityDerived = Constructor<any[], Entity>;
@@ -519,10 +518,8 @@ export function prepareExposable<
     Target: TargetConstructor,
     options: Options
 ) {
-    const { Serializer } = Realms.active();
-    Serializer.addExposable(Target, options.as);
+    Serializer.global.addExposable(Target, options.as);
 }
 
 // Сделать, чтобы при new Constructor у Enttity derived классов throw new InstanceError
 // Также выбрасывать ее, если в InjectContext не хватает данных
-// TODO: Решить, стоит ли отказаться от @Injectable для полей объекта и поставить их целиком для всего класса

@@ -1,8 +1,8 @@
 import { IJsonModel, IJsonRowNode, IJsonTabSetNode } from "flexlayout-react";
-import { TableConfig } from "./types";
+import { LayoutConfig } from "./types";
 
 export function createJsonModel(
-    ...rawConfig: TableConfig
+    ...rawConfig: LayoutConfig
 ): IJsonModel {
     const rows = rawConfig;
 

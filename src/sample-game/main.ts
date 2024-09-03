@@ -1,5 +1,3 @@
-
-
 import Collider from "../engine/base/collider/base";
 import SimpleCollider from "../engine/base/collider/square/simple";
 import Placeable from "../engine/base/placeable/base";
@@ -8,8 +6,10 @@ import { Captured } from "../engine/controller/base";
 import { Decorate, is } from "../engine/decorators";
 import Entity, { EntitiesSymbol } from "../engine/entity/entity";
 import make from "../engine/entity/make";
+import { FullscreenEnvironment } from "../engine/environment/fullscreen";
 import Point from "../engine/primitives/point";
 import Size from "../engine/primitives/size";
+import { Project } from "../engine/project";
 import { RendererSymbol } from "../engine/render/renderable/base";
 import Canvas2dRenderable from "../engine/render/renderable/canvas2d/base";
 import HTMLRenderable from "../engine/render/renderable/html/base";
@@ -19,19 +19,6 @@ import { Scene } from "../engine/scene/scene";
 
 // TODO: сделать систему позиционирования (в т. ч. возможность позиционирования относительно World/Entity),
 // а также возможность использования разных единиц измерения
-// TODO: доделать parent/child и вызывать destroy цепочкой + добавить setParent
-
-// Избавится от такой инициализации, вся подобная работа должна быть сделана
-// самим пользователем
-
-const canvas = document.querySelector("#canvas") as HTMLCanvasElement;
-canvas.width = document.body.clientWidth;
-canvas.height = document.body.clientHeight;
-
-const root = document.querySelector("#root2") as HTMLDivElement;
-
-export const CanvasRenderer = new Canvas2DRenderer(canvas);
-export const UIRenderer = new HTMLRenderer(root);
 
 @Decorate({ expose: true })
 class Wall extends Square {
@@ -182,9 +169,14 @@ class Player extends Square {
     }
 }
 
-const scene = new Scene('hello scene', async function() {
+const scene = new Scene<FullscreenEnvironment>('hello scene', async function() {
     const { InjectContext, Entities } = this.realm;
 
+    // TODO: Вынести взаимодействия с env'ом
+    const { CanvasRenderer, UIRenderer } = this.environment;
+
+    // TODO: стоит подумать, как вынести взаимодействие с InjectContext
+    // напрямую в loader'е
     // realm.InjectContext.set(Placeable, 'position', () => new Point(0, 0));
     // realm.InjectContext.set(Placeable, 'size', () => new Size(0, 0));
     InjectContext.set(Placeable, 'parent', undefined);
@@ -210,7 +202,12 @@ const scene = new Scene('hello scene', async function() {
     make(Player);
 });
 
+const project = new Project('hello project', {
+    scenes: [scene],
+    environment: new FullscreenEnvironment(),
+});
 
 export {
-    scene as simpleScene,
+    scene,
+    project,
 }

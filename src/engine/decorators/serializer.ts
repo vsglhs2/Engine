@@ -1,6 +1,8 @@
 import { AnyConstructor, DecoratorConstructor } from ".";
 
 export default class Serializer {
+    public static global = new Serializer();
+    
     public exposed: Map<
         DecoratorConstructor,
         Record<string | symbol, AnyConstructor>

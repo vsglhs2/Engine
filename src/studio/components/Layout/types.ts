@@ -1,16 +1,13 @@
 import { FunctionComponent } from "react";
 
-export type TableColumn<
-    Component extends FunctionComponent<Record<string, unknown>>
-    = FunctionComponent<Record<string, unknown>>
-> = {
-    component: Component;
+export type LayoutColumn = {
+    component: FunctionComponent<Record<string, unknown>>;
     width: number;
 };
 
-export type TableRow = {
-    columns: TableColumn[];
+export type LayoutRow = {
+    columns: LayoutColumn[];
     height: number;
 };
 
-export type TableConfig = TableRow[];
+export type LayoutConfig = LayoutRow[];

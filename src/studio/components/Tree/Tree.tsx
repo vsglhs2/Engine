@@ -1,18 +1,29 @@
+import { Project } from "@/engine/project";
 import { Accordion, AccordionDetails, AccordionGroup, AccordionSummary } from "@mui/joy";
 import { FC } from "react";
 
-export const Tree: FC = () => {
+type TreeProps = {
+    project: Project;
+};
+
+export const Tree: FC<TreeProps> = ({ project }) => {
+    const { scenes, name } = project;
+
+    const accordions = scenes.map(scene => (
+        <Accordion key={scene.name}>
+            <AccordionSummary>
+                {scene.name}
+            </AccordionSummary>
+            <AccordionDetails>
+                {scene.name}
+            </AccordionDetails>
+        </Accordion>
+    ))
+
     return (
         <div>
             <AccordionGroup>
-                <Accordion>
-                    <AccordionSummary>
-                        Hello
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        Hello1
-                    </AccordionDetails>
-                </Accordion>
+                {accordions}
             </AccordionGroup>            
         </div>
     );

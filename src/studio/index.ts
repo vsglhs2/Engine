@@ -5,7 +5,7 @@ import Point from "../engine/primitives/point";
 import Size from "../engine/primitives/size";
 import SceneManager from "../engine/scene/manager";
 import { Scene } from "../engine/scene/scene";
-import { CanvasRenderer, simpleScene, UIRenderer } from "../sample-game/main";
+import { scene as simpleScene } from "../sample-game/main";
 import CaptureController from "../engine/controller/capture";
 import Loop from "../engine/loop/main";
 import { Realms } from "../engine/realm";
@@ -56,7 +56,6 @@ const mouseContext: {
 };
 
 wrapScene(simpleScene.name);
-manager.add(simpleScene.name, simpleScene);
 switchScene(simpleScene);
 
 function wrapScene(sceneName: string) {
@@ -67,6 +66,8 @@ function wrapScene(sceneName: string) {
 
     sceneSelect.append(option);
     sceneSelect.value = sceneName;
+
+    manager.add(simpleScene.name, simpleScene);
 }
 
 function makeScene(sceneName: string) {

@@ -1,21 +1,32 @@
-import { FC, useMemo } from "react";
-import { Canvas, Explorer, Layout, TopBar, Tree } from "../../components";
+import { FC } from "react";
+import { Layout, TopBar } from "../../components";
 import './Studio.Module.scss';
-import { col, row } from "../../components/Layout";
+import { observer } from "mobx-react-lite";
+import { projects } from "../../stores";
+import { useStudioConfig } from "./use-studio-config";
+import { Alert, PageContainer } from "@/studio/ui";
+import { useTranslation } from "react-i18next";
 
-export const Studio: FC = () => {
-    const config = useMemo(() => [
-        row(
-            col(Tree),
-            col(Canvas, 2),
-            col(Explorer),
-        ),
-    ], []);
+export const Studio: FC = observer(() => {
+    const project = projects.active;
+    const config = useStudioConfig();
+    const { t } = useTranslation();
+
+    if (!project) {
+        return (
+            <PageContainer>
+                <Alert color="danger">
+                    {t('Active project doesn\'t exist. Can\'t open studio')}
+                </Alert>         
+            </PageContainer>
+
+        )
+    }
 
     return (
         <>
             <TopBar />
-            <Layout config={config} />
+            { project && <Layout config={config} project={project} /> }
         </>
     )
-};
+});
