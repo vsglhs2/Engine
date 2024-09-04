@@ -1,14 +1,15 @@
 import { Telescope as TelescopeNS, telescope } from "@/studio/stores";
 import { Autocomplete, AutocompleteChangeReason, Modal } from "@mui/joy";
 import { observer } from "mobx-react-lite";
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, FocusEvent, useCallback, useState } from "react";
 import './Telescope.Module.scss';
 import { useMousePosition } from "@/studio/hooks";
 
 const defaultOptions: Required<TelescopeNS.Options> = {
     options: [],
     multiple: false,
-    require: false
+    require: false,
+    defaultValue: '',
 };
 
 type OnChange = (
@@ -16,6 +17,8 @@ type OnChange = (
     value: string | string[] | null,
     reason: AutocompleteChangeReason,
 ) => void;
+
+// TODO: разобраться, по какой причине autoSelect не срабатывает и приходится использовать onFocus
 
 export const Telescope: FC = observer(() => {
     const [value, setValue] = useState<string | string[] | null>(null);
@@ -25,7 +28,8 @@ export const Telescope: FC = observer(() => {
     const {
         options,
         multiple,
-        require
+        require,
+        defaultValue,
     } = head ?? defaultOptions;
 
     const position = useMousePosition([head]);
@@ -43,10 +47,14 @@ export const Telescope: FC = observer(() => {
 
         if (value instanceof Array && multiple) {
             resolved = { type: 'options', options: value };
+        } else if (value instanceof Array) {
+            resolved = { type: 'values', values: value };
+        } else if (typeof value === 'string' && require) {
+            resolved = { type: 'option', option: value };
         } else if (typeof value === 'string' && require) {
             resolved = { type: 'option', option: value };
         } else if (typeof value === 'string') {
-            resolved = { type: 'arbitrary', value };
+            resolved = { type: 'value', value };
         }
 
         if (!resolved) return;
@@ -54,9 +62,13 @@ export const Telescope: FC = observer(() => {
         setValue(null);
     }, [head]);
 
-    const onClose = useCallback(() => telescope.resolve({
+    const onBlur = useCallback(() => telescope.resolve({
         type: 'closed',
     }), []);
+
+    const onFocus = useCallback((e: FocusEvent<HTMLInputElement>) => {
+        setTimeout(() => e.target.select());
+    }, []);
 
     return (
         <Modal
@@ -77,7 +89,8 @@ export const Telescope: FC = observer(() => {
             <Autocomplete
                 onChange={onChange}
                 onKeyDown={onKeyDown}
-                onBlur={onClose}
+                onBlur={onBlur}
+                onFocus={onFocus}
                 autoFocus
                 openOnFocus
                 clearOnBlur
@@ -88,7 +101,7 @@ export const Telescope: FC = observer(() => {
                 options={options}
                 freeSolo={!require}
                 multiple={multiple}
-                value={value}
+                value={value ?? defaultValue}
             />
         </Modal>
     );

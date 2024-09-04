@@ -9,16 +9,28 @@ export namespace Telescope {
         options?: Option[];
         require?: boolean;
         multiple?: boolean;
+        defaultValue?: string;
     }
+
     type TicketedOptions = Required<Options> & {
         ticket: number;
     };
 
-    export type ResolvedType = 'arbitrary' |  'option' | 'options' | 'closed';
+    type DefaultOptions = { 
+        options: [],
+        require: false, 
+        multiple: false, 
+        defaultValue: undefined
+    };
+
+    export type ResolvedType = 'value' | 'values' |  'option' | 'options' | 'closed';
     type ResolvedPayload<Type extends ResolvedType> = {
-        'arbitrary': {
+        'value': {
             value: Value;
         };
+        'values': {
+            values: Value[];
+        },
         'option': {
             option: Option;
         };
@@ -37,7 +49,7 @@ export namespace Telescope {
     };
 
     type ResolvedTypeFrom<O extends Options> = O['require'] extends false
-        ? 'arbitrary'
+        ? O['multiple'] extends true ? 'values' : 'value'
         : O['multiple'] extends true ? 'options' : 'option';
 
     export class Store {
@@ -64,19 +76,19 @@ export namespace Telescope {
             return this.stack[0];
         }
     
-        async request<O extends Options = { options: [], require: false, multiple: false }>(
-            options?: O
-        ) {
+        // FIXME  Сделать так, чтобы при передаче только defaultValue автоматически выводился value
+        async request<O extends Options = DefaultOptions>(options?: O) {
             const ticket = this.ticket();
             this.stack.push({
                 multiple: false,
                 require: false,
                 options: [],
+                defaultValue: '',
                 ...options,
                 ticket,
             });
 
-            // console.log('Requested with:', this.stack[0]);
+            console.log('Requested with:', { ...this.stack[0] });
 
             await when(() => this.resolved?.ticket === ticket);
             delete this.resolved?.['ticket'];
@@ -85,7 +97,7 @@ export namespace Telescope {
                 this.resolved as unknown as Resolved<ResolvedTypeFrom<O>> | Resolved<'closed'>;
             this.resolved = undefined;
 
-            // console.log('Resolved with:', resolved);
+            console.log('Resolved with:', { ...resolved });
 
             return resolved;
         }

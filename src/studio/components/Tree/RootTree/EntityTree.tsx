@@ -1,11 +1,11 @@
 import Entity from "@/engine/entity/entity";
-import { Accordion, AccordionDetails, AccordionGroup, AccordionSummary, Typography } from "@mui/joy";
-import { FC } from "react";
+import { Accordion, AccordionDetails, AccordionGroup, AccordionSummary, Menu, MenuItem, Typography } from "@mui/joy";
+import { FC, useCallback } from "react";
 import './Tree.Module.scss';
 import { WithContextMenu } from "@/studio/ui";
-import { menuItem } from "@/studio/utils";
 import { telescope } from "@/studio/stores";
 import { useSerializer } from "@/studio/hooks";
+import { t } from "i18next";
 
 type EntityTreeProps = {
     entity: Entity;
@@ -19,10 +19,25 @@ export const EntityTree: FC<EntityTreeProps> = ({ entity }) => {
     const name = getEntityName(entity) ?? entity.constructor.name;
     const key = name;
 
+    const onRenameEntity = useCallback(async () => {
+        const response = await telescope.request({
+            require: false,
+            defaultValue: name,
+        });
+        if (response.type === 'closed') return;
+
+        setEntityName(entity, response.value);
+    }, []);
+
     if (!children.length) return (
-        <div className="typography-container">
+        <WithContextMenu className="typography-container">
+            <Menu>
+                <MenuItem onClick={onRenameEntity}>
+                    {t(`Rename ${key}`)}
+                </MenuItem>
+            </Menu>
             <Typography key={key} style={{ padding: '2px 12px' }}>{name}</Typography>
-        </div>
+        </WithContextMenu>
     );
 
     const details = children.map(
@@ -30,14 +45,12 @@ export const EntityTree: FC<EntityTreeProps> = ({ entity }) => {
     );
 
     return (
-        <WithContextMenu items={[menuItem('Rename ' + key, async () => {
-            const response = await telescope.request();
-            if (response.type === 'closed') return;
-
-            const name = response.value;
-            setEntityName(entity, name);
-
-        })]}>
+        <WithContextMenu>
+            <Menu>
+                <MenuItem onClick={onRenameEntity}>
+                    {t(`Rename ${key}`)}
+                </MenuItem>
+            </Menu>
             <Accordion key={key}>
                 <AccordionSummary slotProps={{
                     button: { style: { paddingTop: 2, paddingBottom: 2 } }
