@@ -9,7 +9,7 @@ const defaultOptions: Required<TelescopeNS.Options> = {
     options: [],
     multiple: false,
     require: false,
-    defaultValue: '',
+    defaultValue: null,
 };
 
 type OnChange = (

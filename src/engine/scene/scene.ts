@@ -1,10 +1,13 @@
+import { MakeFunction } from "../entity/make";
 import { Environment } from "../environment/base";
 import { Realm, Realms } from "../realm";
 
-// Может быть, стоит сделать сцену как прокси
 export class Scene<Env extends Environment = Environment> {
     public name: string;
     public realm!: Realm;
+    public make!: MakeFunction;
+
+    // THINK: создавать realm в environment, так как такие вещи, как Renderer именно от него зависят ?
     public environment!: Env;
     private loader: () => void;
     
@@ -20,6 +23,9 @@ export class Scene<Env extends Environment = Environment> {
         
         this.realm = realm;
         Realms.push(this.realm);
+
+        this.make = this.realm.make;
+
         return this.loader();
     }
 

@@ -3,21 +3,39 @@ import { Accordion, AccordionDetails, AccordionGroup, AccordionSummary, Menu, Me
 import { FC, useCallback } from "react";
 import './Tree.Module.scss';
 import { WithContextMenu } from "@/studio/ui";
-import { telescope } from "@/studio/stores";
-import { useSerializer } from "@/studio/hooks";
+import { globalSerializer, telescope, tree } from "@/studio/stores";
 import { t } from "i18next";
+import { observer } from "mobx-react-lite";
+import { EntityDerived } from "@/engine/decorators";
 
 type EntityTreeProps = {
     entity: Entity;
 };
 
-// Do tree virtualization
+// Do tree virtualization and proper memoization
 
-export const EntityTree: FC<EntityTreeProps> = ({ entity }) => {
+export const EntityTree: FC<EntityTreeProps> = observer(({ entity }) => {
     const { children } = entity;
-    const { getEntityName, setEntityName } = useSerializer();
-    const name = getEntityName(entity) ?? entity.constructor.name;
-    const key = name;
+    const name = globalSerializer.getEntityName(entity);
+    const expanded = tree.getExpanded(entity);
+
+    const onCreateEntity = useCallback(async () => {
+        const response = await telescope.request({ 
+            options: globalSerializer.exposedKeys,
+            require: true,
+        });
+
+        if (response.type === 'closed') return;
+        const { option: key } = response;
+
+        const Constructor = globalSerializer.getExposedConstructor(key);
+        // FIXME fix type
+        const object = entity.make(Constructor as EntityDerived, {
+            parent: entity,
+        });
+        tree.setExpanded(object, true);
+        console.log('Created', key, object);
+    }, [globalSerializer.exposedKeys]);
 
     const onRenameEntity = useCallback(async () => {
         const response = await telescope.request({
@@ -26,36 +44,59 @@ export const EntityTree: FC<EntityTreeProps> = ({ entity }) => {
         });
         if (response.type === 'closed') return;
 
-        setEntityName(entity, response.value);
-    }, []);
+        globalSerializer.setEntityName(entity, response.value);
+    }, [entity, name]);
+
+    const onDeleteEntity = useCallback(async () => {
+        entity.destroy();
+    }, [entity]);
+
+    const onChangeAccordion = useCallback((_: unknown, expanded: boolean) => {
+        tree.setExpanded(entity, expanded);
+    }, [entity]);
 
     if (!children.length) return (
         <WithContextMenu className="typography-container">
             <Menu>
+                <MenuItem onClick={onCreateEntity}>
+                    {t(`Create entity`)}
+                </MenuItem>
                 <MenuItem onClick={onRenameEntity}>
-                    {t(`Rename ${key}`)}
+                    {t(`Rename ${name}`)}
+                </MenuItem>
+                <MenuItem onClick={onDeleteEntity}>
+                    {t(`Delete ${name}`)}
                 </MenuItem>
             </Menu>
-            <Typography key={key} style={{ padding: '2px 12px' }}>{name}</Typography>
+            <Typography style={{ padding: '2px 12px' }}>{name}</Typography>
         </WithContextMenu>
     );
 
     const details = children.map(
-        (entity, i) => <EntityTree key={key + i} entity={entity} />
+        (entity, i) => <EntityTree key={name + i} entity={entity} />
     );
 
     return (
-        <WithContextMenu>
+        <WithContextMenu >
             <Menu>
+                <MenuItem onClick={onCreateEntity}>
+                    {t(`Create entity`)}
+                </MenuItem>
                 <MenuItem onClick={onRenameEntity}>
-                    {t(`Rename ${key}`)}
+                    {t(`Rename ${name}`)}
+                </MenuItem>
+                <MenuItem onClick={onDeleteEntity}>
+                    {t(`Delete ${name}`)}
                 </MenuItem>
             </Menu>
-            <Accordion key={key}>
+            <Accordion
+                expanded={expanded}
+                onChange={onChangeAccordion}
+            >
                 <AccordionSummary slotProps={{
                     button: { style: { paddingTop: 2, paddingBottom: 2 } }
                 }}>
-                    {entity.constructor.name}
+                    {name}
                 </AccordionSummary>
                 <AccordionDetails slotProps={{
                     content: { style: { paddingTop: 0, paddingBottom: 0, paddingRight: 0 } }
@@ -67,5 +108,5 @@ export const EntityTree: FC<EntityTreeProps> = ({ entity }) => {
             </Accordion>
         </WithContextMenu>
     );
-}
+});
 

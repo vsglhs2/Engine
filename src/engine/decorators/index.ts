@@ -518,7 +518,7 @@ export function prepareExposable<
     Target: TargetConstructor,
     options: Options
 ) {
-    Serializer.global.addExposable(Target, options.as);
+    Serializer.global.addExposed(Target, options.as);
 }
 
 // Сделать, чтобы при new Constructor у Enttity derived классов throw new InstanceError

@@ -9,7 +9,7 @@ export namespace Telescope {
         options?: Option[];
         require?: boolean;
         multiple?: boolean;
-        defaultValue?: string;
+        defaultValue?: string | null;
     }
 
     type TicketedOptions = Required<Options> & {
@@ -83,7 +83,7 @@ export namespace Telescope {
                 multiple: false,
                 require: false,
                 options: [],
-                defaultValue: '',
+                defaultValue: null,
                 ...options,
                 ticket,
             });

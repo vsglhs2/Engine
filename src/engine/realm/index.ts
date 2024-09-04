@@ -2,6 +2,7 @@
 import InjectContext, { InjectStack } from "../decorators/inject-context";
 import Serializer from "../decorators/serializer";
 import { Entities } from "../entity/entities";
+import make, { BoundMakeFunction } from "../entity/make";
 import { RootEntity } from "../entity/root";
 
 export class Realms {
@@ -23,6 +24,8 @@ export class Realms {
     }
 }
 
+export const RealmSymbol = Symbol('Realm Symbol');
+
 export class Realm {
     public InjectContext: InjectContext;
     public InjectStack: InjectStack;
@@ -30,6 +33,7 @@ export class Realm {
     public Root: RootEntity;
     // TODO: решить, нужен ли local Serializer, или достаточно global
     public Serializer: Serializer;
+    public make!: BoundMakeFunction<this>;
 
     constructor() {
         this.InjectContext = new InjectContext();
@@ -37,6 +41,7 @@ export class Realm {
         this.Entities = new Entities();
         this.Root = new RootEntity();
         this.Serializer = new Serializer();
+        this.make = make.bind(this) as BoundMakeFunction<this>;
     }
 
     destroy() {
@@ -48,11 +53,6 @@ export class Realm {
     }
 }
 
-// TODO: убрать
-declare global {
-    var Realms: Realms;
-}
-window.Realms = Realms;
 
 // Содержит в себе инстансы глобальных классов по типу Entities
 // из него экспортируются instance и inject decorators

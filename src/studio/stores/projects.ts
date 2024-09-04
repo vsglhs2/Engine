@@ -1,6 +1,7 @@
 import { autorun, makeAutoObservable } from "mobx";
 import { Project } from "../../engine/project/project";
 import { project } from "../../sample-game/main";
+import { globalSerializer } from "./serializer";
 
 export class ProjectsStore {
     public projectsRecord: Record<string, Project>;
@@ -29,6 +30,7 @@ export class ProjectsStore {
             throw new Error(`There is no project with [${project.name}] name`);
 
         this.active = this.projectsRecord[name];
+        globalSerializer.sync();
     }
 }
 

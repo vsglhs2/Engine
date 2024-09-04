@@ -1,8 +1,9 @@
+import { RealmSymbol } from "../realm";
 import Entity, { IRootEntity } from "./entity";
 
 export const RootSymbol = Symbol('Root Symbol');
 export function root(entity: Entity) {
-    return entity[RootSymbol];
+    return entity[RealmSymbol]['Root'];
 }
 
 export class RootEntity implements IRootEntity {

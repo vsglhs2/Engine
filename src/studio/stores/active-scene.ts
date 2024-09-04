@@ -1,26 +1,8 @@
-import { Entities } from "@/engine/entity/entities";
-import { RootEntity } from "@/engine/entity/root";
-import { Realm } from "@/engine/realm";
 import { Scene } from "@/engine/scene/scene";
 import { action, isObservableObject, makeAutoObservable, makeObservable, observable } from "mobx";
+import { ActiveRealmStore } from "./realm";
 
-class ActiveRealmStore extends Realm {
-    constructor () {
-        super();
-
-        this.Root = makeAutoObservable(new RootEntity());
-        this.Entities = makeAutoObservable(new Entities());
-
-        makeObservable(this, {
-            destroy: action,
-            Entities: observable,
-            InjectContext: observable,
-            InjectStack: observable,
-            Root: observable,
-            Serializer: observable,
-        });
-    }
-}
+// THINK: convert it to SceneStore like RealmStore?
 
 export class ActiveSceneStore {
     public scene?: Scene;

@@ -1,7 +1,19 @@
-import { Decorate, i, injectableAndSerializable, Mark } from "../../decorators";
+import { Decorate, injectableAndSerializable, Mark } from "../../decorators";
 import Entity from "../../entity/entity";
 import Point from "../../primitives/point";
 import Size from "../../primitives/size";
+
+export function MustGetRidOfThisPlaceableDefaults(entity: Entity) {
+    if (!(entity instanceof Placeable)) return;
+
+    // FIXME: get rid of this mess
+    if (!entity.size && entity.parent instanceof Placeable) entity.size = entity.parent.size;
+
+    if (!entity.position && entity.parent instanceof Placeable) entity.position = new Point(0, 0);
+
+    if (!entity.size) entity.size = new Size(0, 0);
+    if (!entity.position) entity.position = new Point(0, 0);
+}
 
 export interface IPlaceable {
     size: Size;
@@ -13,12 +25,12 @@ export interface IPlaceable {
     size: injectableAndSerializable(Size, [true]),
     position: injectableAndSerializable(Point, [true]),
 })
-export default class Placeable extends Entity implements IPlaceable { 
+export default class Placeable extends Entity implements IPlaceable {
     declare size: Size;
     declare position: Point;
 
     public get globalPosition(): Mark<Point> {
-        const adjustTo = this.parent instanceof Placeable 
+        const adjustTo = this.parent instanceof Placeable
             ? this.parent.globalPosition
             : new Point(0, 0);
 
@@ -28,13 +40,7 @@ export default class Placeable extends Entity implements IPlaceable {
     constructor() {
         super();
 
-        // FIXME: get rid of this mess
-        if (!this.size && this.parent instanceof Placeable) this.size = this.parent.size;
-
-        if (!this.position && this.parent instanceof Placeable) this.position = new Point(0, 0);
-
-        if (!this.size) this.size = new Size(0, 0);
-        if (!this.position) this.position = new Point(0, 0);
+        MustGetRidOfThisPlaceableDefaults(this);
     }
 
     protected moveTo(point: Point) {

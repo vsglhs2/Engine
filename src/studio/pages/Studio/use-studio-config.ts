@@ -8,8 +8,8 @@ export function useStudioConfig() {
     return useMemo(() => [
         row(
             col('Tree', Tree),
-            col('Canvas', Canvas, 2),
-            col('Explorer', Explorer),
+            col('Canvas', Canvas, 0),
+            col('Explorer', Explorer, 0),
         ),
     ], []);
 }
