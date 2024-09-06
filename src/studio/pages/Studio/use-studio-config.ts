@@ -9,7 +9,7 @@ export function useStudioConfig() {
         row(
             col('Tree', Tree),
             col('Canvas', Canvas, 0),
-            col('Explorer', Explorer, 0),
+            col('Explorer', Explorer),
         ),
     ], []);
 }

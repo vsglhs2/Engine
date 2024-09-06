@@ -1,5 +1,6 @@
-import { DecoratorConstructor } from "@/engine/decorators";
+import { AnyConstructor, DecoratorConstructor } from "@/engine/decorators";
 import Serializer, { SerializableState } from "@/engine/decorators/serializer";
+import { mapPrototypeChain } from "@/engine/decorators/utils/prototype";
 import Entity from "@/engine/entity/entity";
 import { action, computed, makeObservable, observable } from "mobx";
 import { computedFn } from "mobx-utils";
@@ -8,8 +9,8 @@ import { computedFn } from "mobx-utils";
 
 export class SerializerStore extends Serializer {
     declare getEntityName: (entity: Entity) => string;
-    declare getSerializableState: (key: string | DecoratorConstructor) => SerializableState;
-    declare getExposedConstructor: (key: string) => DecoratorConstructor;
+    declare getSerializableState: (entity: Entity) => SerializableState | undefined;
+    declare getExposedConstructor: (key: string) => DecoratorConstructor | undefined;
 
     private serializer: Serializer;
 
@@ -35,24 +36,18 @@ export class SerializerStore extends Serializer {
             return this.namedMap.get(entity) ?? entity.constructor.name;
         });
 
-        this.getSerializableState = computedFn((key: string | DecoratorConstructor) => {
-            const Constructor = typeof key === 'string' ? this.exposedMap.get(key) : key;
-            if (!Constructor)
-                throw new Error(`[${key}] is not exposed`);
-    
-            const state = this.serializableMap.get(Constructor);
-            if (!state)
-                throw new Error(`There is no serialize state for [${Constructor}]`);
-    
-            return state;
+        this.getSerializableState = computedFn((entity: Entity) => {
+            const Constructor = entity.constructor as DecoratorConstructor;
+
+            return mapPrototypeChain(
+                Constructor, (Constructor) => this.serializableMap.get(Constructor)
+            ).reduceRight<Record<string, AnyConstructor>>((record, state) => {
+                return Object.assign(record, state);
+            }, {});
         });
     
         this.getExposedConstructor = computedFn((key: string) => {
-            const Constructor = this.exposedMap.get(key);
-            if (!Constructor)
-                throw new Error(`[${key}] in not exposed`);
-    
-            return Constructor;
+            return this.exposedMap.get(key);
         });
     }
 

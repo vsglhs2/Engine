@@ -13,6 +13,7 @@ export class TreeStore {
     declare getExpanded: (entity: Entity) => NodeState['expanded'];
 
     public serializer: SerializerStore;
+    // WeakMap ?
     public state: Map<Entity, NodeState> = new Map();
 
     constructor (serializer: SerializerStore) {

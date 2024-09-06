@@ -55,7 +55,10 @@ type InjectOptions = {
     as?: AnyConstructor;
 };
 
-export class Json { }
+export type JsonLike = Record<string, unknown>;
+export class Json implements JsonLike {
+    [x: string | symbol]: unknown;
+}
 export class Callback {
     constructor(callback: (...args: any[]) => any) {
         return callback;
@@ -367,22 +370,24 @@ export const Decorate = <
         const keyInput = input.keys[key];
         if (keyInput === false) continue;
     
-        if (keyInput.injectable === false) continue;
-        const [value, checker] = prepareInjection(
-            Constructor, 
-            keyInput.injectable.as,
-            key, 
-            keyInput.injectable
-        );
-        decorators.push([key, value, checker]);
+        if (keyInput.injectable) {
+            const [value, checker] = prepareInjection(
+                Constructor, 
+                keyInput.injectable.as,
+                key, 
+                keyInput.injectable
+            );
+            decorators.push([key, value, checker]);            
+        }
     
-        if (keyInput.serializable === false) continue;
-        prepareSerialization(
-            Constructor, 
-            keyInput.serializable.as,
-            key, 
-            keyInput.serializable
-        );
+        if (keyInput.serializable) {
+            prepareSerialization(
+                Constructor, 
+                keyInput.serializable.as,
+                key, 
+                keyInput.serializable
+            );            
+        }
     }
 
     global.set(Constructor, DecoratorSymbol, decorators);

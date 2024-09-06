@@ -2,12 +2,14 @@ import { action, makeObservable, observable } from "mobx";
 import { globalSerializer, SerializerStore } from "./serializer";
 import Entity from "@/engine/entity/entity";
 import { computedFn } from "mobx-utils";
+import { DecoratorConstructor } from "@/engine/decorators";
 
 export class ExplorerStore {
     declare getEntityIndex: (entity: Entity) => number;
 
+    // TODO: поделить Serializer на EntitySerializer и ConstructorSerializer
     public serializer: SerializerStore;
-    public state: Entity[] = [];
+    public state: InstanceType<DecoratorConstructor>[] = [];
 
     constructor (serializer: SerializerStore) {
         this.serializer = serializer;

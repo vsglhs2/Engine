@@ -25,10 +25,10 @@ export function mapPrototypeChain<
 
 export function walkPrototypeChain<
     Target extends AnyConstructor,
-    Condition extends (target: Target) => any
+    Condition extends (target: Target) => Boolean
 >(target: Target, condition: Condition): AnyConstructor | undefined {
     const prototype = Object.getPrototypeOf(target);
-    const Result = Boolean(condition(target)) ? target : undefined;
+    const Result = condition(target) ? target : undefined;
     if (!prototype) return Result;
 
     return Result ?? walkPrototypeChain(prototype, condition);

@@ -1,9 +1,10 @@
+import SquareCollider from "@/engine/base/collider/square/base";
 import Collider from "../engine/base/collider/base";
 import SimpleCollider from "../engine/base/collider/square/simple";
 import Placeable from "../engine/base/placeable/base";
 import Square from "../engine/base/renderables/square/base";
 import { Captured } from "../engine/controller/base";
-import { Decorate, is } from "../engine/decorators";
+import { Decorate, is, serializable } from "../engine/decorators";
 import Entity from "../engine/entity/entity";
 import make from "../engine/entity/make";
 import { FullscreenEnvironment } from "../engine/environment/fullscreen";
@@ -90,14 +91,22 @@ class Menu extends Entity {
 
 @Decorate({
     expose: true,
+    isMoving: serializable(Boolean),
+    speed: serializable(Number),
+    collider: serializable(Collider),
 })
 class Player extends Square {
-    private collider: Collider;
+    declare isMoving: boolean;
+    declare speed: number;
+    declare collider: Collider;
+
     constructor() {
         super();
         
         this.size = new Size(30, 30);
         this.position = new Point(300, 70);
+        this.isMoving = false;
+        this.speed = 10;
 
         this.make(Square, {
             position: new Point(10, 10),
@@ -211,6 +220,7 @@ const scene = new Scene<FullscreenEnvironment>('hello scene', function() {
         color: '#00FF00',
     });
     this.make(Player);
+    this.make(SquareCollider);
 });
 
 const project = new Project('hello project', {
