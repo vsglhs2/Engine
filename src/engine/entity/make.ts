@@ -36,7 +36,7 @@ export default function make<
     return instance as unknown as InstanceType<Constructor>;
 }
 
-// TODO: Заменить на OmitThisType (Падает с cycle ref error)
+// TODO: Заменить на OmitThisType (Падает с circular ref error)
 export type MakeFunction = <
     Constructor extends EntityDerived,
     Args extends ConstructorParameters<Constructor>

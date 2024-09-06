@@ -1,15 +1,16 @@
 import { Dropdown, MenuButton } from "@mui/joy";
-import { FC, useState, useCallback, HTMLAttributes, Children, cloneElement, ReactElement } from "react";
+import { useState, useCallback, HTMLAttributes, Children, cloneElement, ReactElement, forwardRef, PropsWithRef } from "react";
 import { OutsideClickHandler } from "../OutsideClickHandler";
 import { useMousePosition } from "@/studio/hooks";
 
-type WithContextMenuProps = HTMLAttributes<HTMLDivElement> & {
+type ContextMenuProps = HTMLAttributes<HTMLDivElement> & {
     children: ReactElement[];
 };
 
-// TODO: Сделать возможным рендерить только одно контекстное меню в один момент времени
-
-export const WithContextMenu: FC<WithContextMenuProps> = ({ children, ...props }) => {
+export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(({ 
+    children,
+    ...props 
+}, ref) => {
     const [open, setOpen] = useState(false);
 
     const position = useMousePosition([open]);
@@ -41,6 +42,7 @@ export const WithContextMenu: FC<WithContextMenuProps> = ({ children, ...props }
     return (
         <OutsideClickHandler
             {...props}
+            ref={ref}
             onClickOutside={onClickOutside}
             onContextMenuOutside={onClickOutside}
             onContextMenu={onContextMenu}
@@ -56,4 +58,4 @@ export const WithContextMenu: FC<WithContextMenuProps> = ({ children, ...props }
             </Dropdown>
         </OutsideClickHandler>
     );
-}
+});

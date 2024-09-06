@@ -15,6 +15,8 @@ export class ActiveRealmStore extends Realm {
             parent: observable,
             add: action, 
             destroy: action,
+            before: action,
+            after: action,
             remove: action,
         });
         this.Entities = makeAutoObservable(new Entities());
@@ -47,6 +49,8 @@ export class ActiveRealmStore extends Realm {
                 add: action,
                 remove: action,
                 destroy: action,
+                before: action,
+                after: action,
             });
 
             InjectStack.pop();

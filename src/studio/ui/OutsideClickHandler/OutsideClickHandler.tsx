@@ -1,24 +1,32 @@
 import { useOutsideClickHandler } from "@/studio/hooks";
-import { FC, useRef } from "react";
+import { forwardRef, useRef } from "react";
 
 type OutsideClickHandlerProps = React.HTMLAttributes<HTMLDivElement> & {
     onClickOutside: (e: MouseEvent) => void;
     onContextMenuOutside: (e: MouseEvent) => void;
 };
 
-export const OutsideClickHandler: FC<OutsideClickHandlerProps> = ({
+export const OutsideClickHandler = forwardRef<HTMLDivElement, OutsideClickHandlerProps>(({
     onClickOutside,
     onContextMenuOutside,
     children,
     ...props
-}) => {
-    const ref = useRef<HTMLDivElement>(null);
-    useOutsideClickHandler(ref, onClickOutside);
-    useOutsideClickHandler(ref, onContextMenuOutside, 'contextmenu');
+}, outerRef) => {
+    const handlerRef = useRef<HTMLDivElement | null>(null);
+    useOutsideClickHandler(handlerRef, onClickOutside);
+    useOutsideClickHandler(handlerRef, onContextMenuOutside, 'contextmenu');
+
+    const onRef = (element: HTMLDivElement | null) => {
+        handlerRef.current = element;
+
+        if (typeof outerRef === 'function') return outerRef(element);
+        if (!outerRef) return;
+        outerRef.current = element;
+    }
 
     return (
-        <div {...props} ref={ref}>
+        <div {...props} ref={onRef}>
             {children}
         </div>
     );
-}
+});

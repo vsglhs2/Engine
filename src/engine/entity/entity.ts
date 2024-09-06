@@ -1,3 +1,4 @@
+import invariant from "tiny-invariant";
 import { Captured } from "../controller/base";
 import { Callback, Decorate, Decorator, injectable, Mark } from "../decorators";
 import { Realm, RealmSymbol } from "../realm";
@@ -36,6 +37,20 @@ export default abstract class Entity extends Decorator(EventTarget) implements I
     // FIXME 
     add(entity: Entity) {
         this.children.push(entity);
+    }
+
+    after(entity: Entity, after: Entity) {
+        const index = this.children.findIndex(e => e === after);
+        invariant(index !== -1, `There is no ${after} entity among the children`);
+
+        this.children.splice(index, 0, entity);
+    }
+
+    before(entity: Entity, before: Entity) {
+        const index = this.children.findIndex(e => e === before);
+        invariant(index !== -1, `There is no ${before} entity among the children`);
+
+        this.children.splice(index - 1, 0, entity);
     }
 
     remove(entity: Entity) {

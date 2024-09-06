@@ -1,6 +1,6 @@
 import { Scene } from "@/engine/scene/scene";
 import { projects, activeScene, telescope } from "@/studio/stores";
-import { WithContextMenu } from "@/studio/ui";
+import { ContextMenu } from "@/studio/ui";
 import { Menu, MenuItem, Option, Select } from "@mui/joy";
 import { t } from "i18next";
 import { observer } from "mobx-react-lite";
@@ -38,7 +38,7 @@ export const ScenePicker: FC = observer(() => {
     useEffect(() => activeScene.activate(project.scene(sceneName)!), []);
 
     return (
-        <WithContextMenu>
+        <ContextMenu>
             <Menu>
                 <MenuItem onClick={onCreateScene}>
                     {t(`Create new scene`)}
@@ -64,6 +64,6 @@ export const ScenePicker: FC = observer(() => {
                     </Option>
                 ))}
             </Select>
-        </WithContextMenu>
+        </ContextMenu>
     )
 });

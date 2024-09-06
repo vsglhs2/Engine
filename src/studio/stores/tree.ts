@@ -22,6 +22,7 @@ export class TreeStore {
             state: observable,
             setState: action,
             setExpanded: action,
+            toggleExpanded: action,
         });
 
         this.getState = computedFn((entity: Entity) => {
@@ -47,6 +48,11 @@ export class TreeStore {
     setExpanded(entity: Entity, expanded: NodeState['expanded']) {
         const state = this.getState(entity);
         state.expanded = expanded;
+    }
+
+    toggleExpanded(entity: Entity) {
+        const state = this.getState(entity);
+        state.expanded = !state.expanded;
     }
 
     destroy() {
