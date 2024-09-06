@@ -7,9 +7,9 @@ import { row, col } from "../../components/Layout";
 export function useStudioConfig() {
     return useMemo(() => [
         row(
-            col(Tree),
-            col(Canvas, 2),
-            col(Explorer),
+            col('Tree', Tree),
+            col('Canvas', Canvas, 0),
+            col('Explorer', Explorer, 0),
         ),
     ], []);
 }

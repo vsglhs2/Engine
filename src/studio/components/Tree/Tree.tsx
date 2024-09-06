@@ -1,30 +1,19 @@
-import { Project } from "@/engine/project";
-import { Accordion, AccordionDetails, AccordionGroup, AccordionSummary } from "@mui/joy";
+import { observer } from "mobx-react-lite";
 import { FC } from "react";
+import { RootTree } from "./RootTree";
+import { ScenePicker } from "./ScenePicker";
+import { activeScene } from "@/studio/stores/active-scene";
 
-type TreeProps = {
-    project: Project;
-};
+export const Tree: FC = observer(() => {
+    const { Root: root } = activeScene.realm;
 
-export const Tree: FC<TreeProps> = ({ project }) => {
-    const { scenes, name } = project;
-
-    const accordions = scenes.map(scene => (
-        <Accordion key={scene.name}>
-            <AccordionSummary>
-                {scene.name}
-            </AccordionSummary>
-            <AccordionDetails>
-                {scene.name}
-            </AccordionDetails>
-        </Accordion>
-    ))
-
+    console.log(root.children);
+    const tree = root && <RootTree root={root} />;
+    
     return (
-        <div>
-            <AccordionGroup>
-                {accordions}
-            </AccordionGroup>            
-        </div>
+        <>
+            <ScenePicker />
+            {tree}
+        </>
     );
-};
+});

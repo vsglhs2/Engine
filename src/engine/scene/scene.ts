@@ -1,29 +1,35 @@
+import { MakeFunction } from "../entity/make";
 import { Environment } from "../environment/base";
 import { Realm, Realms } from "../realm";
 
-// Может быть, стоит сделать сцену как прокси
 export class Scene<Env extends Environment = Environment> {
     public name: string;
-    public realm: Realm;
-    public environment!: Env;
-    private loader: () => Promise<void>;
-    
-    constructor (name: string, load?: (this: Scene<Env>) => Promise<void>) {
-        this.name = name;
-        this.realm = new Realm();
-        Realms.push(this.realm);
+    public realm!: Realm;
+    public make!: MakeFunction;
 
-        const loader = load ? load : async () => {};
+    // THINK: создавать realm в environment, так как такие вещи, как Renderer именно от него зависят ?
+    public environment!: Env;
+    private loader: () => void;
+    
+    constructor (name: string, load?: (this: Scene<Env>) => void) {
+        this.name = name;
+
+        const loader = load ? load : () => {};
         this.loader = loader.bind(this);
     }
 
-    public async load() {
+    public load(realm = new Realm()) {
         if (!this.environment) throw new Error('Can\'t load scene without environment');
+        
+        this.realm = realm;
+        Realms.push(this.realm);
+
+        this.make = this.realm.make;
 
         return this.loader();
     }
 
-    public async reload() {
+    public reload() {
         this.destroy();
         return this.load();
     }

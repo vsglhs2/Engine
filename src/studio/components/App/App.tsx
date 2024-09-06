@@ -9,8 +9,9 @@ const router = createBrowserRouter(routes);
 export const App: FC = () => {
     return (
         <React.StrictMode>
-            <I18nextProvider i18n={i18n}></I18nextProvider>
-            <RouterProvider router={router} />
+            <I18nextProvider i18n={i18n}>
+                <RouterProvider router={router} />
+            </I18nextProvider>
         </React.StrictMode>
     )
 };

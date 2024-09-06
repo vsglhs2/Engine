@@ -4,7 +4,7 @@ import Placeable from "../engine/base/placeable/base";
 import Square from "../engine/base/renderables/square/base";
 import { Captured } from "../engine/controller/base";
 import { Decorate, is } from "../engine/decorators";
-import Entity, { EntitiesSymbol } from "../engine/entity/entity";
+import Entity from "../engine/entity/entity";
 import make from "../engine/entity/make";
 import { FullscreenEnvironment } from "../engine/environment/fullscreen";
 import Point from "../engine/primitives/point";
@@ -13,9 +13,8 @@ import { Project } from "../engine/project";
 import { RendererSymbol } from "../engine/render/renderable/base";
 import Canvas2dRenderable from "../engine/render/renderable/canvas2d/base";
 import HTMLRenderable from "../engine/render/renderable/html/base";
-import Canvas2DRenderer from "../engine/render/renderer/canvas2d/base";
-import HTMLRenderer from "../engine/render/renderer/html/renderer";
 import { Scene } from "../engine/scene/scene";
+import { RealmSymbol } from "@/engine/realm";
 
 // TODO: сделать систему позиционирования (в т. ч. возможность позиционирования относительно World/Entity),
 // а также возможность использования разных единиц измерения
@@ -26,7 +25,7 @@ class Wall extends Square {
 
     constructor() {
         super();
-        this.collider = make(SimpleCollider, {
+        this.collider = this.make(SimpleCollider, {
             parent: this,
         });
     }
@@ -81,7 +80,7 @@ class Menu extends Entity {
     constructor() {
         super();
 
-        this.renderer = make(MenuRenderer, {
+        this.renderer = this.make(MenuRenderer, {
             items: this.items,
             counter: this.counter,
             parent: this
@@ -89,6 +88,9 @@ class Menu extends Entity {
     }
 }
 
+@Decorate({
+    expose: true,
+})
 class Player extends Square {
     private collider: Collider;
     constructor() {
@@ -97,14 +99,21 @@ class Player extends Square {
         this.size = new Size(30, 30);
         this.position = new Point(300, 70);
 
-        make(Square, {
+        this.make(Square, {
             position: new Point(10, 10),
             size: new Size(10, 10),
             parent: this,      
             color: "#ff00ff",      
         });
 
-        this.collider = make(SimpleCollider, {
+        this.make(Wall, {
+            position: new Point(100, 100),
+            size: new Size(10, 10),
+            parent: this,      
+            color: "#ff00ff",      
+        });
+
+        this.collider = this.make(SimpleCollider, {
             parent: this,            
         });
 
@@ -169,8 +178,8 @@ class Player extends Square {
     }
 }
 
-const scene = new Scene<FullscreenEnvironment>('hello scene', async function() {
-    const { InjectContext, Entities } = this.realm;
+const scene = new Scene<FullscreenEnvironment>('hello scene', function() {
+    const { InjectContext } = this.realm;
 
     // TODO: Вынести взаимодействия с env'ом
     const { CanvasRenderer, UIRenderer } = this.environment;
@@ -179,27 +188,29 @@ const scene = new Scene<FullscreenEnvironment>('hello scene', async function() {
     // напрямую в loader'е
     // realm.InjectContext.set(Placeable, 'position', () => new Point(0, 0));
     // realm.InjectContext.set(Placeable, 'size', () => new Size(0, 0));
-    InjectContext.set(Placeable, 'parent', undefined);
     InjectContext.set(Canvas2dRenderable, RendererSymbol, CanvasRenderer);
     InjectContext.set(HTMLRenderable, RendererSymbol, UIRenderer);
-    InjectContext.set(Entity, EntitiesSymbol, Entities);
+    InjectContext.set(Entity, RealmSymbol, this.realm);    
+    InjectContext.set(Entity, 'parent', undefined);
+    // TODO: разобраться, почему не выводится тип
+    InjectContext.set(Entity, 'make', () => this.make);
     InjectContext.set(Square, 'color', "#ff0000");
 
-    make(Menu, {
+    this.make(Menu, {
         size: new Size(300, 200),
         position: new Point(0, 0),
     });
-    make(Wall, {
+    this.make(Wall, {
         size: new Size(50, 50),
         position: new Point(100, 100),
         color: '#00FF00'
     });
-    make(Wall, {
+    this.make(Wall, {
         size: new Size(20, 20),
         position: new Point(200, 100),
         color: '#00FF00',
     });
-    make(Player);
+    this.make(Player);
 });
 
 const project = new Project('hello project', {

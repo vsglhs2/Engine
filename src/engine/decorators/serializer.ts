@@ -1,29 +1,40 @@
 import { AnyConstructor, DecoratorConstructor } from ".";
+import Entity from "../entity/entity";
+
+export type SerializableState = Record<string | symbol, AnyConstructor>;
+
+// TODO: make more handy api
 
 export default class Serializer {
     public static global = new Serializer();
     
-    public exposed: Map<
+    public serializableMap: Map<
         DecoratorConstructor,
-        Record<string | symbol, AnyConstructor>
+        SerializableState
     > = new Map();
-    public keys: Map<DecoratorConstructor, string> = new Map();
+    public exposedMap: Map<string, DecoratorConstructor> = new Map();
+    // TODO: need to be weak map, but otherwise cant figure out how to sync with mobx
+    public namedMap: Map<Entity, string> = new Map();
 
     addSerializable(Constructor: DecoratorConstructor, key: string | symbol, as: AnyConstructor) {
-        let keys = this.exposed.get(Constructor);
-        if (!keys) keys = this.exposed.set(Constructor, {}).get(Constructor)!;
+        let keys = this.serializableMap.get(Constructor);
+        if (!keys) keys = this.serializableMap.set(Constructor, {}).get(Constructor)!;
 
         keys[key] = as;
     }
 
-    addExposable(Constructor: DecoratorConstructor, as: string) {
-        this.exposed.set(Constructor, {});
-        this.keys.set(Constructor, as);
+    addExposed(Constructor: DecoratorConstructor, as: string) {
+        this.serializableMap.set(Constructor, {});
+        this.exposedMap.set(as, Constructor);
+    }
+
+    addName(entity: Entity, name: string) {
+        this.namedMap.set(entity, name);
     }
 
     public clear() {
-        this.exposed.clear();
-        this.keys.clear();
+        this.serializableMap.clear();
+        this.exposedMap.clear();
     }
 }
 

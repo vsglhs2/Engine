@@ -25,13 +25,56 @@ export class Project<Env extends Environment = Environment> {
         return [file];
     }
 
+    private scenesRecord: Record<string, Scene<Env>>;
     public name: string;
-    public scenes: Scene[];
     public environment: Env;
 
     constructor (name: string, options?: ProjectOptions<Env>) {
         this.name = name;
-        this.scenes = options?.scenes ?? [];
-        this.environment = options?.environment ?? new EmptyEnvironment() as Env;
+        const assignedOptions: ProjectOptions<Env> = {
+            scenes: [],
+            environment: new EmptyEnvironment() as Env,
+            ...options,
+        };
+
+        const { scenes, environment } = assignedOptions;
+
+        this.scenesRecord = scenes.reduce<Record<string, Scene<Env>>>(
+            (record, scene) => {
+                if (!(scene.name in record)) record[scene.name] = scene;
+                scene.environment = environment;
+
+                return record;
+            }, {}
+        );
+        this.environment = environment;
+    }
+
+    public addScene(scene: Scene<Env>) {
+        if (scene.name in this.scenesRecord)
+            throw new Error(`Project [${this.name}] already has scene with name [${scene.name}]`);
+
+        this.scenesRecord[scene.name] = scene;
+        scene.environment = this.environment;
+    }
+
+    public removeScene(scene: Scene<Env>) {
+        if (!(scene.name in this.scenesRecord))
+            throw new Error(`There is no scene with name [${scene.name}] in project [${this.name}]`);
+        
+        delete this.scenesRecord[scene.name];
+        scene.destroy();
+    }
+
+    public scenes() {
+        return Object.values(this.scenesRecord);
+    }
+
+    public scene(name: string): Scene<Env> | undefined {
+        return this.scenesRecord[name];
+    }
+
+    public sceneNames() {
+        return Object.keys(this.scenesRecord);
     }
 }

@@ -14,7 +14,7 @@ export function createJsonModel(
             children: [
                 {
                     type: "row",
-                    component: column.component.name,
+                    component: column.name,
                 }
             ]
         }));

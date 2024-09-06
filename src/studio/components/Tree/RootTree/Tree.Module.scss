@@ -1,0 +1,32 @@
+.typography-container {
+    display: flex;
+    align-items: center;
+    
+    width: 100%;
+    height: 36px;
+
+    overflow: hidden;
+}
+
+.typography-container > div {
+    width: 100%;
+}
+
+.root-tree {
+    height: 100%;
+}
+
+.dragging {
+    opacity: 0.4;
+}
+
+.draggable-line {
+    width: 100%;
+    height: 2px;
+
+    background: transparent;
+}
+
+.draggable-line--over {
+    background-color: #000000;
+}

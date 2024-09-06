@@ -1,6 +1,7 @@
-import { makeAutoObservable } from "mobx";
+import { autorun, makeAutoObservable } from "mobx";
 import { Project } from "../../engine/project/project";
 import { project } from "../../sample-game/main";
+import { globalSerializer } from "./serializer";
 
 export class ProjectsStore {
     public projectsRecord: Record<string, Project>;
@@ -21,7 +22,7 @@ export class ProjectsStore {
         if (project.name in this.projectsRecord)
             throw new Error(`There is already project with [${project.name}] name`);
 
-        this.projectsRecord[project.name] = project;
+        this.projectsRecord[project.name] = makeAutoObservable(project);
     }
 
     activate(name: string) {
@@ -29,6 +30,7 @@ export class ProjectsStore {
             throw new Error(`There is no project with [${project.name}] name`);
 
         this.active = this.projectsRecord[name];
+        globalSerializer.sync();
     }
 }
 
