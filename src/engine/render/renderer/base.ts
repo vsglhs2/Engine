@@ -1,9 +1,6 @@
 import Renderable from "../renderable/base";
 import { RendererContext } from "./utils";
 
-// Подумать, как вынести создание Renderer (Canvas2dRenderer и HTMLRednerer) 
-// отдельно от передачи в конструктор
-
 export default abstract class Renderer<Context extends RendererContext = RendererContext> {
     protected renderables = new Map<Renderable<Renderer<Context>>, true>();
 
@@ -27,5 +24,9 @@ export default abstract class Renderer<Context extends RendererContext = Rendere
     }
     public clearRenderables(): void {
         this.renderables.clear();
+    }
+
+    public destroy() {
+        this.clearRenderables();
     }
 }

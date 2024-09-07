@@ -8,6 +8,13 @@ export default class Point {
         return this;
     }
 
+    shiftTo(point: Point) {
+        this.x = point.x;
+        this.y = point.y;
+
+        return this;
+    }
+
     toShiftedBy(point: Point) {
         return new Point(this.x, this.y).shiftBy(point);
     }
@@ -18,6 +25,17 @@ export default class Point {
 
     equals(point: Point) {
         return point.x === this.x && point.y === this.y;
+    }
+
+    subBy(point: Point) {
+        this.x -= point.x;
+        this.y -= point.y;
+
+        return this;
+    }
+
+    toSubBy(point: Point) {
+        return new Point(this.x, this.y).subBy(point);
     }
 
     //mutate(mut: ())

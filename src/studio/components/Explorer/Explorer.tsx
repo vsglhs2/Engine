@@ -1,14 +1,19 @@
-import { explorer, globalSerializer } from "@/studio/stores";
+import { context, globalSerializer } from "@/studio/stores";
 import { converterComponents, converterValues } from "@/studio/stores/converter";
 import { Alert, PageContainer } from "@/studio/ui";
-import { Box, Typography } from "@mui/joy";
+import { ClearSharp } from "@mui/icons-material";
+import { Box, IconButton, Typography } from "@mui/joy";
 import { observer } from "mobx-react-lite";
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 export const Explorer: FC = observer(() => {
     const { t } = useTranslation();
-    const [entity] = explorer.state;
+    const [entity] = context.stack;
+
+    const onEntityClose = useCallback(() => {
+        context.popEntity();
+    }, []);
 
     if (!entity) {
         return (
@@ -22,9 +27,14 @@ export const Explorer: FC = observer(() => {
 
     const name = globalSerializer.getEntityName(entity);
     const renderedHead = (
-        <Typography>
-            {name}
-        </Typography>
+        <Box display="flex" justifyContent="space-between">
+            <Typography>
+                {name}
+            </Typography>  
+            <IconButton onClick={onEntityClose}>
+                <ClearSharp />
+            </IconButton>          
+        </Box>
     );
 
     const serializerState = globalSerializer.getSerializableState(entity);

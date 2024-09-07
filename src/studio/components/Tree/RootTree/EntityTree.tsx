@@ -3,7 +3,7 @@ import { Accordion, AccordionDetails, AccordionGroup, AccordionSummary, Menu, Me
 import { FC, MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import './Tree.Module.scss';
 import { ContextMenu } from "@/studio/ui";
-import { globalSerializer, telescope, tree, explorer } from "@/studio/stores";
+import { globalSerializer, telescope, tree, context } from "@/studio/stores";
 import { t } from "i18next";
 import { observer } from "mobx-react-lite";
 import { EntityDerived } from "@/engine/decorators";
@@ -25,12 +25,10 @@ type EntityTreeProps = {
 export const EntityTree: FC<EntityTreeProps> = observer(({ entity }) => {
     const { children } = entity;
     const name = globalSerializer.getEntityName(entity);
-    const expanded = tree.getExpanded(entity);
-    const selected = explorer.getEntityIndex(entity) !== -1;
+    const { expanded, draggedOver, dragging } = tree.getState(entity);
+    const selected = context.getEntityIndex(entity) !== -1;
     const draggableRef = useRef<HTMLDivElement>(null);
     const targetRef = useRef<HTMLDivElement>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [isDraggedOver, setIsDraggedOver] = useState(false);
 
     const onCreateEntity = useCallback(async () => {
         const response = await telescope.request({ 
@@ -70,7 +68,7 @@ export const EntityTree: FC<EntityTreeProps> = observer(({ entity }) => {
         e.stopPropagation();
     }, [entity]);
 
-    const onSelect = useCallback(() => explorer.putEntity(entity), [entity]);
+    const onSelect = useCallback(() => context.putEntity(entity), [entity]);
 
     useEffect(() => {
         const draggableElement = draggableRef.current;
@@ -103,10 +101,10 @@ export const EntityTree: FC<EntityTreeProps> = observer(({ entity }) => {
                     })
                 },
                 onDragStart(args) {
-                    setIsDragging(true);
+                    tree.setDragging(entity, true);
                 },
                 onDrop(args) {
-                    setIsDragging(false);
+                    tree.setDragging(entity, false);
                 },
             }),
             dropTargetForElements({
@@ -118,17 +116,25 @@ export const EntityTree: FC<EntityTreeProps> = observer(({ entity }) => {
                     };
                 },
                 onDragEnter(args) {
-                    setIsDraggedOver(true);
+                    tree.setDraggedOver(entity, true);
                 },
                 onDragLeave(args) {
-                    setIsDraggedOver(false);
+                    tree.setDraggedOver(entity, false);
                 },
                 onDrop(args) {
-                    setIsDraggedOver(false);
+                    tree.setDraggedOver(entity, false);
                 },
             })
         );
     }, []);
+
+    useEffect(() => {
+        let target = entity.parent;
+        while(target) {
+            tree.setExpanded(target, true);
+            target = target.parent;
+        }
+    }, [selected]);
 
     const details = children.map(
         (entity, i) => <EntityTree key={name + i} entity={entity} />
@@ -136,7 +142,7 @@ export const EntityTree: FC<EntityTreeProps> = observer(({ entity }) => {
 
     const renderTree = Boolean(children.length);
     const className = classNames(renderTree ? undefined : 'typography-container');
-    const variant: VariantProp | undefined = isDraggedOver
+    const variant: VariantProp | undefined = draggedOver
         ? 'outlined'
             : selected ? 'soft' : undefined;
 
@@ -147,7 +153,7 @@ export const EntityTree: FC<EntityTreeProps> = observer(({ entity }) => {
         >
             <AccordionSummary 
                 variant={variant}
-                className={classNames(isDragging && 'dragging')}
+                className={classNames(dragging && 'dragging')}
                 slotProps={{
                     button: { style: { paddingTop: 2, paddingBottom: 2 } },
                     indicator: { onClick: onExpand, style: { display: 'flex', alignItems: 'center', height: '100%' } }
@@ -167,7 +173,6 @@ export const EntityTree: FC<EntityTreeProps> = observer(({ entity }) => {
         </Accordion>
     ) : (
         <Typography
-            onDragStart={console.log}
             onClick={onSelect} 
             variant={variant} 
             sx={{ padding: '2px 12px', userSelect: 'none' }}

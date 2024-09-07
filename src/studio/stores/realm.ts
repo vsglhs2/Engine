@@ -2,7 +2,7 @@ import Placeable, { MustGetRidOfThisPlaceableDefaults } from "@/engine/base/plac
 import { Marked } from "@/engine/decorators";
 import { Entities } from "@/engine/entity/entities";
 import Entity from "@/engine/entity/entity";
-import { root, RootEntity } from "@/engine/entity/root";
+import { RootEntity } from "@/engine/entity/root";
 import { Realm } from "@/engine/realm";
 import { makeAutoObservable, makeObservable, action, observable } from "mobx";
 
@@ -44,7 +44,7 @@ export class ActiveRealmStore extends Realm {
             }
 
             const instance = new Constructor(...args);
-            const observed = makeObservable(instance, {
+            let observed = makeObservable(instance, {
                 children: observable,
                 add: action,
                 remove: action,
@@ -57,7 +57,11 @@ export class ActiveRealmStore extends Realm {
             // @ts-ignore FIXME: fix type
             observed.parent = parent ?? this.Root;
 
-            if (observed instanceof Placeable) {
+            if (observed instanceof Placeable && !observed.size.height && !observed.size.width) {
+                // @ts-ignore  FIXME
+                observed.size = undefined;
+                // @ts-ignore FIXME
+                observed.position = undefined;
                 MustGetRidOfThisPlaceableDefaults(observed);
             }
 

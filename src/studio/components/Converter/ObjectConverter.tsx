@@ -1,5 +1,5 @@
 import Entity from "@/engine/entity/entity";
-import { activeScene, globalSerializer, telescope } from "@/studio/stores";
+import { scene, globalSerializer, telescope } from "@/studio/stores";
 import { ConverterProps } from "@/studio/stores/converter";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { Box, Typography } from "@mui/joy";
@@ -13,7 +13,7 @@ export const ObjectConverter: FC<ConverterProps<Entity, typeof Entity>> = observ
     const [isHovering, setIsHovering] = useState(false);
 
     const onClick = async () => {
-        const entities = Array.from(activeScene.realm.Entities.entities.keys());
+        const entities = Array.from(scene.realm.Entities.entities.keys());
         const options = entities
             .filter(entity => entity instanceof store.as)
             .map(entity => globalSerializer.getEntityName(entity));

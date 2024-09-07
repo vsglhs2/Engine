@@ -3,6 +3,7 @@ export default class HTMLRenderingContext {
 
     render(toRender: HTMLElement) {
         this.root.append(toRender);
+        this.root.style.userSelect = 'none';
     }
 
     clear() {

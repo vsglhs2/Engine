@@ -2,7 +2,8 @@ import { entities } from "../../../entity/entity";
 import Collider from "../base";
 import { IPlaceable } from "../../placeable/base";
 
-export function intersectsWith(source: IPlaceable, target: IPlaceable) {
+type IntersectTarget = Omit<IPlaceable, 'globalPosition'>;
+export function intersectsWith(source: IntersectTarget, target: IntersectTarget) {
         const square1 = [
             source.position.x,
             source.position.x + source.size.width,
@@ -28,7 +29,7 @@ export function intersectsWith(source: IPlaceable, target: IPlaceable) {
 }
 
 export default class SimpleCollider extends Collider {
-    public intersectsWith(target: SimpleCollider): boolean {
+    public intersectsWith(target: IPlaceable): boolean {
         return intersectsWith({
             position: this.globalPosition,
             size: this.size,
@@ -41,7 +42,8 @@ export default class SimpleCollider extends Collider {
     public intersects(): SimpleCollider[] {
         const intersects: SimpleCollider[] = [];
 
-        for (const entity of entities(this).entities.keys()) {
+        const keys = entities(this).entities.keys();
+        for (const entity of keys) {
             if (!(entity instanceof SimpleCollider) || entity === this)
                 continue;
             if (this.intersectsWith(entity)) intersects.push(entity);

@@ -25,6 +25,9 @@ export class Realms {
 }
 
 export const RealmSymbol = Symbol('Realm Symbol');
+export interface IRealmed {
+    [RealmSymbol]: Realm;
+}
 
 export class Realm {
     public InjectContext: InjectContext;

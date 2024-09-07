@@ -1,5 +1,5 @@
 import { Scene } from "@/engine/scene/scene";
-import { projects, activeScene, telescope } from "@/studio/stores";
+import { projects, scene, telescope } from "@/studio/stores";
 import { ContextMenu } from "@/studio/ui";
 import { Menu, MenuItem, Option, Select } from "@mui/joy";
 import { t } from "i18next";
@@ -14,7 +14,7 @@ export const ScenePicker: FC = observer(() => {
         if (!value || !project.scene(value)) return;
         setSceneName(value);
 
-        activeScene.activate(project.scene(value)!);
+        scene.activate(project.scene(value)!);
     }
 
     const onCreateScene = useCallback(async () => {
@@ -35,7 +35,7 @@ export const ScenePicker: FC = observer(() => {
 
     const onRenameScene = useCallback(async () => {}, []);
 
-    useEffect(() => activeScene.activate(project.scene(sceneName)!), []);
+    useEffect(() => scene.activate(project.scene(sceneName)!), []);
 
     return (
         <ContextMenu>

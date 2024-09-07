@@ -2,53 +2,60 @@ import { action, makeObservable, observable } from "mobx";
 import { globalSerializer, SerializerStore } from "./serializer";
 import Entity from "@/engine/entity/entity";
 import { computedFn } from "mobx-utils";
-import { DecoratorConstructor } from "@/engine/decorators";
 
-export class ExplorerStore {
+export class ContextStore {
     declare getEntityIndex: (entity: Entity) => number;
 
     // TODO: поделить Serializer на EntitySerializer и ConstructorSerializer
     public serializer: SerializerStore;
-    public state: InstanceType<DecoratorConstructor>[] = [];
+    public stack: Entity[] = [];
 
     constructor (serializer: SerializerStore) {
         this.serializer = serializer;
 
         makeObservable(this, {
-            state: observable,
+            stack: observable,
             putEntity: action,
             pushEntity: action,
+            popEntity: action,
             removeEntity: action,
         });
 
         this.getEntityIndex = computedFn((entity: Entity) => {
-            return this.state.findIndex(e => e === entity);
+            return this.stack.findIndex(e => e === entity);
         });
     }
 
     pushEntity(entity: Entity) {
         const index = this.getEntityIndex(entity);
         if (index !== -1)
-            throw new Error(`Entity [${entity}] already in explorer`);
+            throw new Error(`Entity [${entity}] already in context`);
 
-        this.state.push(entity);
+        this.stack.push(entity);
+    }
+
+    popEntity() {
+        if (!this.stack.length)
+            throw new Error(`There is no entity to pop`);
+
+        return this.stack.pop();
     }
 
     putEntity(entity: Entity, atIndex = 0) {
-        this.state.splice(atIndex, 1, entity);
+        this.stack.splice(atIndex, 1, entity);
     }
 
     removeEntity(entity: Entity) {
         const index = this.getEntityIndex(entity);
         if (index === -1) 
-            throw new Error(`There is no entity [${entity}] in explorer`);
+            throw new Error(`There is no entity [${entity}] in context`);
 
-        this.state.splice(index, 1);
+        this.stack.splice(index, 1);
     }
 
     destroy() {
-        this.state.length = 0;
+        this.stack.length = 0;
     }
 }
 
-export const explorer = new ExplorerStore(globalSerializer);
+export const context = new ContextStore(globalSerializer);

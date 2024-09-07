@@ -1,3 +1,4 @@
+export { canvas, CanvasStore } from "./canvas";
 export {
     converterComponents,
     converterValues,
@@ -9,9 +10,9 @@ export type {
     ConverterProps,
     ConvertibleValueComponent
 } from "./converter";
-export { explorer, ExplorerStore } from "./explorer";
+export { context, ContextStore } from "./context";
 export { tree, TreeStore } from "./tree";
 export { globalSerializer, SerializerStore } from "./serializer";
 export { telescope, Telescope } from "./telescope";
-export { activeScene, ActiveSceneStore } from "./active-scene";
+export { scene, SceneStore } from "./scene";
 export { projects, ProjectsStore } from "./projects";

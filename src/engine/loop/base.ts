@@ -1,20 +1,23 @@
 import { Captured, IController } from "../controller/base";
 import EmptyController from "../controller/empty";
-import { Realms } from "../realm";
+import { Entities } from "../entity/entities";
 import Renderer from "../render/renderer/base";
 
 export type BaseConfiguration = {
-    renderers: Renderer[];
+    renderers?: Renderer[];
     controller?: IController;
+    entities?: Entities;
 };
 
 export default abstract class BaseLoop {
     private renderers: Renderer[];
     private controller: IController;
+    private entities: Entities;
 
     constructor(config: BaseConfiguration) {
-        this.renderers = config.renderers;
+        this.renderers = config.renderers ?? [];
         this.controller = config.controller ?? new EmptyController();
+        this.entities = config.entities ?? new Entities();
     }
 
     protected prepare() {
@@ -26,8 +29,8 @@ export default abstract class BaseLoop {
     }
 
     protected update(delta: number, captured: Captured): void {
-        const { Entities } = Realms.active();
-        for (const entity of Entities.entities.keys()) {
+        const entities = this.entities.entities.keys();
+        for (const entity of entities) {
             entity.update(delta, captured);
         }
     }

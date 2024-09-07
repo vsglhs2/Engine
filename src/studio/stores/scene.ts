@@ -4,7 +4,7 @@ import { ActiveRealmStore } from "./realm";
 
 // THINK: convert it to SceneStore like RealmStore?
 
-export class ActiveSceneStore {
+export class SceneStore {
     public scene?: Scene;
     public realm: ActiveRealmStore;
 
@@ -29,4 +29,4 @@ export class ActiveSceneStore {
     }
 }
 
-export const activeScene = new ActiveSceneStore();
+export const scene = new SceneStore();

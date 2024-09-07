@@ -18,10 +18,9 @@ export default abstract class Renderable<
     R extends Renderer = Renderer,
     Context extends RendererContext = ReturnType<R["getContext"]>
 > extends Placeable {
-    protected context: Context;
-
-    // FIXME: fix Injectable so can use with abstarct and generic types
     declare [RendererSymbol]: R;
+
+    protected context: Context;
 
     constructor() {
         super();
@@ -29,6 +28,7 @@ export default abstract class Renderable<
         this.context = this[RendererSymbol].getContext() as Context;
         this[RendererSymbol].addRenderable(this as Renderable);
     }
+    
     abstract render(): void;
 
     destroy() {
