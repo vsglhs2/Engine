@@ -1,9 +1,9 @@
 import invariant from "tiny-invariant";
-import { RealmSymbol } from "../realm";
+import { IRealmed, RealmSymbol } from "../realm";
 import Entity, { IRootEntity } from "./entity";
 
 export const RootSymbol = Symbol('Root Symbol');
-export function root(entity: Entity) {
+export function root(entity: IRealmed) {
     return entity[RealmSymbol]['Root'];
 }
 

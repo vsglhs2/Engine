@@ -1,12 +1,12 @@
 import invariant from "tiny-invariant";
 import { Captured } from "../controller/base";
 import { Callback, Decorate, Decorator, injectable, Mark } from "../decorators";
-import { Realm, RealmSymbol } from "../realm";
+import { IRealmed, Realm, RealmSymbol } from "../realm";
 import { MakeFunction } from "./make";
 import { root } from "./root";
 
 export const EntitiesSymbol = Symbol('Entities Symbol');
-export function entities(entity: Entity) {
+export function entities(entity: IRealmed) {
     return entity[RealmSymbol]['Entities'];
 }
 

@@ -18,6 +18,7 @@ export function MustGetRidOfThisPlaceableDefaults(entity: Entity) {
 export interface IPlaceable {
     size: Size;
     position: Point;
+    globalPosition: Point; // TODO: get rid when create proper Transform class
 }
 
 @Decorate({
@@ -43,16 +44,16 @@ export default class Placeable extends Entity implements IPlaceable {
         MustGetRidOfThisPlaceableDefaults(this);
     }
 
-    protected moveTo(point: Point) {
+    public moveTo(point: Point) {
         this.position.x = point.x;
         this.position.y = point.y;
     }
 
-    protected moveBy(shift: Point) {
+    public moveBy(shift: Point) {
         this.position.shiftBy(shift);
     }
 
-    protected resize(size: Size) {
+    public resize(size: Size) {
         this.size.width = size.width;
         this.size.height = size.height;
     }

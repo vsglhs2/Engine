@@ -2,13 +2,13 @@ import { AbstractMarked, DecoratorConstructor } from ".";
 import { walkPrototypeChain } from "./utils/prototype";
 
 export class InjectStack {
-    private stack: Record<string, unknown>[] = [];
+    private stack: Record<string | symbol, unknown>[] = [];
 
     public push() {
         this.stack.unshift({});
     }
 
-    public store(key: string, value: unknown, overwrite = true) {
+    public store(key: string | symbol, value: unknown, overwrite = true) {
         const buffer = this.read();
 
         if (!(key in buffer) || overwrite) buffer[key] = value;

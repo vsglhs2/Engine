@@ -1,10 +1,10 @@
-import Renderer from "../base";
+import MountableRenderer from "../mountable";
 import HTMLRenderingContext from "./context";
 
-export default class HTMLRenderer extends Renderer<HTMLRenderingContext> {
+export default class HTMLRenderer extends MountableRenderer<HTMLRenderingContext> {
     constructor(root: HTMLDivElement) {
         const context = new HTMLRenderingContext(root);
-        super(context);
+        super(root, context);
     }
 
     public prepare(): void {

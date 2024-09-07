@@ -325,7 +325,8 @@ export const Decorator = <Constructor extends AnyConstructor> (Constructor: Cons
                 ...fromStack,
             };
 
-            for (const key in checkers) {
+            const checkerKeys = Reflect.ownKeys(checkers);
+            for (const key of checkerKeys) {
                 const checker = checkers[key];
                 const checked = checker(toInject[key]);
 

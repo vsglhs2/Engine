@@ -2,7 +2,7 @@ import { FC, useCallback } from "react";
 import { EntityTree } from "./EntityTree";
 import { AccordionGroup, Menu, MenuItem } from "@mui/joy";
 import { ContextMenu } from "@/studio/ui";
-import { activeScene, globalSerializer, telescope } from "@/studio/stores";
+import { scene, globalSerializer, telescope } from "@/studio/stores";
 import { EntityDerived } from "@/engine/decorators";
 import './Tree.Module.scss';
 import { RootEntity } from "@/engine/entity/root";
@@ -34,7 +34,7 @@ export const RootTree: FC<RootTreeProps> = observer(({ root }) => {
 
         const Constructor = globalSerializer.getExposedConstructor(key);
         // FIXME fix type
-        const object = activeScene.realm.make(Constructor as EntityDerived);
+        const object = scene.realm.make(Constructor as EntityDerived);
         console.log('Created', key, object);
     }, [globalSerializer.exposedKeys]);
 

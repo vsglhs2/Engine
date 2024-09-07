@@ -7,7 +7,6 @@ import { Captured } from "../engine/controller/base";
 import { Decorate, is, serializable } from "../engine/decorators";
 import Entity from "../engine/entity/entity";
 import make from "../engine/entity/make";
-import { FullscreenEnvironment } from "../engine/environment/fullscreen";
 import Point from "../engine/primitives/point";
 import Size from "../engine/primitives/size";
 import { Project } from "../engine/project";
@@ -16,6 +15,7 @@ import Canvas2dRenderable from "../engine/render/renderable/canvas2d/base";
 import HTMLRenderable from "../engine/render/renderable/html/base";
 import { Scene } from "../engine/scene/scene";
 import { RealmSymbol } from "@/engine/realm";
+import { InPlaceCanvasAndHTMLEnvironment } from "@/engine/environment";
 
 // TODO: сделать систему позиционирования (в т. ч. возможность позиционирования относительно World/Entity),
 // а также возможность использования разных единиц измерения
@@ -187,24 +187,7 @@ class Player extends Square {
     }
 }
 
-const scene = new Scene<FullscreenEnvironment>('hello scene', function() {
-    const { InjectContext } = this.realm;
-
-    // TODO: Вынести взаимодействия с env'ом
-    const { CanvasRenderer, UIRenderer } = this.environment;
-
-    // TODO: стоит подумать, как вынести взаимодействие с InjectContext
-    // напрямую в loader'е
-    // realm.InjectContext.set(Placeable, 'position', () => new Point(0, 0));
-    // realm.InjectContext.set(Placeable, 'size', () => new Size(0, 0));
-    InjectContext.set(Canvas2dRenderable, RendererSymbol, CanvasRenderer);
-    InjectContext.set(HTMLRenderable, RendererSymbol, UIRenderer);
-    InjectContext.set(Entity, RealmSymbol, this.realm);    
-    InjectContext.set(Entity, 'parent', undefined);
-    // TODO: разобраться, почему не выводится тип
-    InjectContext.set(Entity, 'make', () => this.make);
-    InjectContext.set(Square, 'color', "#ff0000");
-
+const scene = new Scene<InPlaceCanvasAndHTMLEnvironment>('hello scene', function() {
     this.make(Menu, {
         size: new Size(300, 200),
         position: new Point(0, 0),
@@ -225,7 +208,7 @@ const scene = new Scene<FullscreenEnvironment>('hello scene', function() {
 
 const project = new Project('hello project', {
     scenes: [scene],
-    environment: new FullscreenEnvironment(),
+    environment: new InPlaceCanvasAndHTMLEnvironment(),
 });
 
 export {
