@@ -17,7 +17,7 @@ export default class MountableRenderer<
         container.appendChild(this.mountable);
 
         return () => {
-            container.removeChild(this.mountable);
+            this.mountable.remove();
         };
     }
 

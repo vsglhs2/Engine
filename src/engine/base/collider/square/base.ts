@@ -1,3 +1,4 @@
+import { Decorate } from "@/engine/decorators";
 import { Captured } from "../../../controller/base";
 import Point from "../../../primitives/point";
 import Size from "../../../primitives/size";
@@ -7,6 +8,7 @@ import Collider from "../base";
 type PositionAreas = Map<Point, Map<Point, Map<Placeable, true>>>;
 type PositionKeys = WeakMap<Placeable, [Point, Point]>;
 
+@Decorate({ expose: true })
 export default class SquareCollider extends Collider {
     protected static PositionAreas: PositionAreas = new Map();
     protected static PositionKeys: PositionKeys = new WeakMap();

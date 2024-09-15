@@ -31,6 +31,13 @@ export default class Canvas2DRenderer extends MountableRenderer<CanvasRenderingC
         console.log(size, element.width, element.height)
     }
 
+    mount(container: HTMLElement): () => void {
+        const { width, height } = container.getBoundingClientRect();
+        this.resize(new Size(width, height));
+        
+        return super.mount(container);
+    }
+
     public prepare(): void {
         this.context.clearRect(0, 0, this.size.width, this.size.height);
     }

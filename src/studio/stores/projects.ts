@@ -1,7 +1,9 @@
-import { autorun, makeAutoObservable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { Project } from "../../engine/project/project";
-import { project } from "../../sample-game/main";
+import sampleProject from "../../sample-game/project";
 import { globalSerializer } from "./serializer";
+import { project } from "./project";
+import { Scene } from "@/engine/scene/scene";
 
 export class ProjectsStore {
     public projectsRecord: Record<string, Project>;
@@ -26,14 +28,15 @@ export class ProjectsStore {
     }
 
     activate(name: string) {
-        if (!(project.name in this.projectsRecord))
-            throw new Error(`There is no project with [${project.name}] name`);
+        if (!(name in this.projectsRecord))
+            throw new Error(`There is no project with [${name}] name`);
 
-        this.active = this.projectsRecord[name];
+        this.active = project.activate(this.projectsRecord[name]);
         globalSerializer.sync();
     }
 }
 
 export const projects = new ProjectsStore();
-projects.add(project);
-projects.activate(project.name);
+projects.add(sampleProject);
+projects.activate(sampleProject.name);
+sampleProject.addScene(new Scene(';wsddjs'));

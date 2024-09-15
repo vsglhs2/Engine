@@ -50,7 +50,7 @@ export const Canvas: FC = observer(() => {
         cleanUps.push(() => window.removeEventListener('resize', handler));
 
         return () => cleanUps.forEach(cleanUp => cleanUp());
-    }, [environment]);
+    }, [environment, scene.scene]);
 
     useEffect(() => {
         console.log('changed Entities');
@@ -74,7 +74,7 @@ export const Canvas: FC = observer(() => {
         invariant(root);
 
         return canvas.bindHandlers(root);
-    }, [scene.realm]);
+    }, [scene.realm, scene.scene]);
 
     console.log('render');
 

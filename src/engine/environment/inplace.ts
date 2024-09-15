@@ -1,6 +1,6 @@
 import Canvas2DRenderer from "../render/renderer/canvas2d/base";
 import HTMLRenderer from "../render/renderer/html/renderer";
-import { Environment } from "./base";
+import { Environment, SerializedEnvironment } from "./base";
 
 export class InPlaceCanvasAndHTMLEnvironment extends Environment {
     constructor() {
@@ -26,4 +26,13 @@ export class InPlaceCanvasAndHTMLEnvironment extends Environment {
 
         super([CanvasRenderer, UIRenderer]);
     }
+
+    async serialize(): Promise<SerializedEnvironment> {
+        return {
+            key: INPLACE_ENVIRONMENT_KEY,
+            shifts: [],
+        };
+    }
 }
+
+export const INPLACE_ENVIRONMENT_KEY = 'environment#inplace';
