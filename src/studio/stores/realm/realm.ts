@@ -1,12 +1,23 @@
 import Placeable, { MustGetRidOfThisPlaceableDefaults } from "@/engine/base/placeable/base";
-import { Marked } from "@/engine/decorators";
-import { Entities } from "@/engine/entity/entities";
+import { EntityDerived, Injectables, Marked } from "@/engine/decorators";
 import Entity from "@/engine/entity/entity";
 import { RootEntity } from "@/engine/entity/root";
 import { Realm } from "@/engine/realm";
-import { makeAutoObservable, makeObservable, action, observable } from "mobx";
+import { makeObservable, action, observable } from "mobx";
+import { EntitiesStore } from "./entities";
 
-export class ActiveRealmStore extends Realm {
+export type MakeFunction = <
+    Constructor extends EntityDerived,
+    Args extends ConstructorParameters<Constructor>
+>(
+    Constructor: Constructor,
+    ...args: [...Args, inject?: Injectables<Constructor> & { id?: string }]
+) => InstanceType<Constructor>;
+
+export class RealmStore extends Realm {
+    declare Entities: EntitiesStore;
+    declare make: MakeFunction & ThisType<RealmStore>;
+
     constructor() {
         super();
 
@@ -19,7 +30,7 @@ export class ActiveRealmStore extends Realm {
             after: action,
             remove: action,
         });
-        this.Entities = makeAutoObservable(new Entities());
+        this.Entities = new EntitiesStore();
 
         this.make = (
             Constructor,
@@ -28,7 +39,8 @@ export class ActiveRealmStore extends Realm {
             const { InjectStack } = this;
 
             const toInjectArray = args.slice(Constructor.length);
-            const toInject: Partial<Marked<typeof Constructor>> = toInjectArray[0] ?? {};
+            const toInject: Partial<Marked<typeof Constructor> > & { id?: string } =
+                toInjectArray[0] ?? {};
 
             type Key = keyof typeof toInject;
 
@@ -40,6 +52,7 @@ export class ActiveRealmStore extends Realm {
 
             InjectStack.push();
             for (const key in toInject) {
+                if (key === 'id') continue;
                 InjectStack.store(key, toInject[key as Key]);
             }
 
@@ -63,6 +76,15 @@ export class ActiveRealmStore extends Realm {
                 // @ts-ignore FIXME
                 observed.position = undefined;
                 MustGetRidOfThisPlaceableDefaults(observed);
+            }
+
+            // TODO: Подумать, как правильнее сделать проброс id
+            if (toInject.id) {
+                this.Entities.add(instance, toInject.id);
+            }
+
+            if (InjectStack.isEmpty()) {
+                this.Entities.serializables.add(observed);
             }
 
             return observed as unknown as InstanceType<typeof Constructor>;

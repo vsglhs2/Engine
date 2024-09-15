@@ -1,5 +1,10 @@
 import Renderer from "../render/renderer/base";
 
+export type SerializedEnvironment = {
+    key: string;
+    shifts: unknown[];
+};
+
 export abstract class Environment {
     public renderers: Renderer[];
 
@@ -12,4 +17,6 @@ export abstract class Environment {
             renderer.destroy();
         }
     }
+
+    abstract serialize(): Promise<SerializedEnvironment>;
 }

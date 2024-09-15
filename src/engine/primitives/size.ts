@@ -1,5 +1,15 @@
+import { sceneSerializer } from "./serializable";
+
 export default class Size {
-    constructor(public width: number, public height: number) {}
+    public width: number;
+    public height: number;
+
+    constructor(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+    }
 }
 
-export class EmptySize extends Size {}
+sceneSerializer.registerSerializable(Size, function () {
+    return [this.width, this.height];
+});

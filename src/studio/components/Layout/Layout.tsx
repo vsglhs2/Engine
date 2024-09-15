@@ -37,6 +37,8 @@ export const Layout: FC<LayoutProps> = ({
         return [Model.fromJson(jsonModel), factory] as const;
     }, [config]);
 
+    console.log(config);
+
     // const onModelChange = (model: Model) => {
     //     const string = model.toString();
     // };

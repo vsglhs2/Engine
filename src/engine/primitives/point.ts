@@ -1,5 +1,13 @@
+import { sceneSerializer } from "./serializable";
+
 export default class Point {
-    constructor(public x: number, public y: number) {}
+    public x: number;
+    public y: number;
+
+    constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
 
     shiftBy(point: Point) {
         this.x += point.x;
@@ -46,4 +54,10 @@ export default class Point {
 
         return this;
     }
+
+
 }
+
+sceneSerializer.registerSerializable(Point, function () {
+    return [this.x, this.y];
+});

@@ -34,7 +34,7 @@ export default abstract class Entity extends Decorator(EventTarget) implements I
 
     children: Mark<Entity[]>;
 
-    // FIXME 
+    /////////////////////////////////// TODO: move to Children class 
     add(entity: Entity) {
         this.children.push(entity);
     }
@@ -57,6 +57,19 @@ export default abstract class Entity extends Decorator(EventTarget) implements I
         const index = this.children.findIndex(e => entity === e);
         this.children.splice(index, 1);
     }
+
+    ///////////////////////////////
+
+    // TODO!!!
+    // Логика, требующая присутствия обязательных injectable полей
+    // должна быть в before; В конструкторе должна быть логина базовой инициализации.
+    // Причем она должна быть детерминирована, чтобы не нарушать работу сериалайзера
+    // (при каждом старте сцены должен один и тот же набор объектов с одними и теми же
+    // сериализуемыми значениями)
+    // before() {}; before loop start
+    // after() {}; after loop stop
+
+    ///////////////////////////////
 
     set parent(parent: Entity | undefined) {
         if (this._parent) {

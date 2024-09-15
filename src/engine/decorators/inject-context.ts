@@ -28,6 +28,10 @@ export class InjectStack {
     public clear() {
         this.stack.length = 0;
     }
+
+    public isEmpty() {
+        return this.stack.length === 0;
+    }
 }
 
 export const DecoratorSymbol = Symbol('Decorator symbol');
