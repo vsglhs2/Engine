@@ -4,6 +4,7 @@ import { createJsonModel } from "./create-json-model";
 import { prepareComponentsRecord } from "./prepare-components-record";
 import { LayoutConfig } from "./types";
 import { PageContainer } from "@/studio/ui";
+import './Layout.Module.scss';
 
 type LayoutProps = {
     config: LayoutConfig;
@@ -43,11 +44,17 @@ export const Layout: FC<LayoutProps> = ({
     //     const string = model.toString();
     // };
 
+    const classNameMapper = (className: string) => {
+        return 
+    };
+
     return (
-        <FlexLayout
-            model={model}
-            factory={factory}
-            realtimeResize
-        />
+        <div className="flex-layout-wrapper">
+            <FlexLayout
+                model={model}
+                factory={factory}
+                realtimeResize
+            />
+        </div>
     )
 };

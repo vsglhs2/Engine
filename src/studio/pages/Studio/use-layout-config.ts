@@ -4,7 +4,7 @@ import { row, col } from "../../components/Layout";
 
 // TODO: use mobx for handling config
 
-export function useStudioConfig() {
+export function useLayoutConfig() {
     return useMemo(() => [
         row(
             col('Tree', Tree),
