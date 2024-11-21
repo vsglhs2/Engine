@@ -149,4 +149,4 @@ export namespace TopBar {
     }
 }
 
-export const topBar = new TopBar.Store();
+export const topbar = new TopBar.Store();

@@ -1,126 +1,103 @@
-import Placeable from "@/engine/base/placeable/base";
-import CaptureController from "@/engine/controller/capture";
+import { createElement, FC, useEffect, useRef, useState } from "react";
+import { EditorCanvas } from "./EditorCanvas/EditorCanvas";
 import ManualLoop from "@/engine/loop/manual";
-import Size from "@/engine/primitives/size";
-import MountableRenderer from "@/engine/render/renderer/mountable";
-import { scene, canvas, context, projects, topBar } from "@/studio/stores";
-import { PageContainer } from "@/studio/ui";
-import { reaction, toJS } from "mobx";
-import { observer } from "mobx-react-lite";
-import { FC, useEffect, useRef, useState } from "react";
-import invariant from "tiny-invariant";
-import { Element } from "./Element";
 import Loop from "@/engine/loop/main";
-import BaseLoop from "@/engine/loop/base";
-import { flushSync } from "react-dom";
+import { observer } from "mobx-react-lite";
+import { CanvasMode, studio } from "@/studio/stores/studio";
+import { canvas, projects, scene } from "@/studio/stores";
+import CaptureController from "@/engine/controller/capture";
+import { PreviewCanvas } from "./PreviewComponent./PreviewCanvas";
+import MountableRenderer from "@/engine/render/renderer/mountable";
+import Size from "@/engine/primitives/size";
+import EmptyController from "@/engine/controller/empty";
+import { PreviewIndicator } from "./PreviewComponent.";
 
 export const Canvas: FC = observer(() => {
-    const rootRef = useRef<HTMLDivElement>(null);
+    const [loop, setLoop] = useState<ManualLoop | Loop | null>(null); 
+    const rootRef = useRef<HTMLDivElement>(null);  
+
+    const { canvasMode } = studio;
     const { environment } = projects.active!;
     const { Entities } = scene.realm;
 
-    // TODO: перенести повыше по компонентам
-    const [loop, setLoop] = useState<BaseLoop>(() => new ManualLoop({
-        controller: new CaptureController(),
-        renderers: environment.renderers,
-        entities: Entities,
-    }));
-
     useEffect(() => {
-        return topBar.subscribe('preview', () => {
-            console.log('preview');
-            const loop = new Loop({
+        let loop: ManualLoop | Loop | null = null;
+        const loopConfiguration = {
+            entities: Entities,
+            renderers: environment.renderers,
+        };
+
+        switch (canvasMode) {
+            case CanvasMode.PREVIEW_PAUSE:
+            case CanvasMode.EDITOR: loop = new ManualLoop({
+                ...loopConfiguration,
+                controller: new EmptyController(),
+            }); break;
+            case CanvasMode.PREVIEW_PLAY: loop = new Loop({
+                ...loopConfiguration,
+                // TODO: pass root here
                 controller: new CaptureController(),
-                renderers: environment.renderers,
-                entities: Entities,
                 fps: 60,
-            });
+            }); break;
+        }
 
-            flushSync(() => setLoop(loop));
-            loop.start();
-        });
-    }, []);
+        setLoop(loop);
 
-    useEffect(() => {
-        return topBar.subscribe('stop', () => {
-            console.log('stop');
+        return () => {
+            if (!loop) return;
 
-            setLoop(loop => loop.stop());
-
-            const newLoop = new ManualLoop({
-                controller: new CaptureController(),
-                renderers: environment.renderers,
-                entities: Entities,
-            });
-
-            setLoop(newLoop);
-        });
-    }, []);
+            loop.destroy();
+        };
+    }, [canvasMode]);
 
     useEffect(() => {
         const root = rootRef.current;
-        invariant(root);
+        if (!root) return;
 
         const mountables = environment.renderers.filter(
             renderer => renderer instanceof MountableRenderer
         );
 
         const cleanUps = mountables.map(mountable => mountable.mount(root));
-        if ('sync' in loop ) loop.sync();
 
         const handler = () => {
             const { clientWidth, clientHeight } = root;
 
             mountables.forEach(mountable => {
-                mountable.resize(new Size(clientWidth, clientHeight))
+                mountable.resize(new Size(clientWidth, clientHeight));
             });
 
-            if ('sync' in loop ) loop.sync();
+            // REDO
+            if (loop instanceof ManualLoop) loop.sync();
         };
 
         handler();
+
+        console.log('mounted', mountables);
 
         window.addEventListener('resize', handler);
         cleanUps.push(() => window.removeEventListener('resize', handler));
 
         return () => cleanUps.forEach(cleanUp => cleanUp());
-    }, [environment, scene.scene, loop]);
+    }, [environment, scene.scene, rootRef.current, loop]);
 
-    useEffect(() => {
-        if (!(loop instanceof ManualLoop)) return;
-
-        console.log('changed Entities');
-        return reaction(() => {
-            toJS(Entities);
-            toJS(context);
-            toJS(canvas);
-            console.log('her');
-        }, () => {
-
-            requestAnimationFrame(() => {
-                loop.sync();
-            });
-
-            console.log('synced')
-        }, { fireImmediately: true, equals: () => false });
-    }, [Entities, loop]);
-
-    useEffect(() => {
-        const root = rootRef.current;
-        invariant(root);
-
-        return canvas.bindHandlers(root);
-    }, [scene.realm, scene.scene]);
-
-    console.log('render');
-
-    const renderedLocked = context.stack
-        .filter(entity => entity instanceof Placeable)
-        .map((placeable, i) => <Element key={i} placeable={placeable} />);
-
-    return (
-        <PageContainer ref={rootRef}>
-            {renderedLocked}
-        </PageContainer>
+    const shouldRenderCanvas = (
+        ([CanvasMode.PREVIEW_PAUSE, CanvasMode.EDITOR].includes(canvasMode)) &&
+        loop instanceof ManualLoop
+    ) || (
+        canvasMode === CanvasMode.PREVIEW_PLAY  && 
+        loop instanceof Loop
     );
+
+    if (!shouldRenderCanvas) return null;
+
+    const CanvasComponent = canvasMode === CanvasMode.PREVIEW_PLAY
+        ? PreviewCanvas
+        : EditorCanvas;
+    
+    return (
+        <CanvasComponent ref={rootRef} loop={loop}>
+            { studio.canvasMode !== CanvasMode.EDITOR && (<PreviewIndicator />) }
+        </CanvasComponent>
+    )
 });

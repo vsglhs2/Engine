@@ -1,4 +1,4 @@
-import { topBar, TopBar } from "@/studio/stores";
+import { topbar, TopBar } from "@/studio/stores";
 import { ListDivider, ListItem, List, MenuItem } from "@mui/joy";
 import { FC, ReactNode } from "react";
 import { TopBarMenu } from "./TopBarMenu";
@@ -15,10 +15,10 @@ export const TopBarElement: FC<TopBarElementProps> = observer(({
 }) => {
     const itemProps = {
         onClick: () => {
-            topBar.menuIndex = null;
-            topBar.dispatch(element.id);
+            topbar.menuIndex = null;
+            topbar.dispatch(element.id);
         },
-        onKeyDown: topBar.handleKeyDown,
+        onKeyDown: topbar.handleKeyDown,
     };
 
     let renderedItem: ReactNode;
@@ -27,21 +27,21 @@ export const TopBarElement: FC<TopBarElementProps> = observer(({
         case TopBar.ElementType.Menu: renderedItem = (
             <TopBarMenu
                 element={element}
-                open={topBar.menuIndex === navigationIndex}
+                open={topbar.menuIndex === navigationIndex}
                 onOpen={() => {
-                    topBar.menuIndex = topBar.menuIndex === null ? navigationIndex : null;
+                    topbar.menuIndex = topbar.menuIndex === null ? navigationIndex : null;
                 }}
                 onClose={() => {
-                    topBar.menus.current[navigationIndex]?.focus();
+                    topbar.menus.current[navigationIndex]?.focus();
                 }}
-                onKeyDown={topBar.createHandleButtonKeyDown(navigationIndex)}
+                onKeyDown={topbar.createHandleButtonKeyDown(navigationIndex)}
                 onMouseEnter={() => {
-                    if (typeof topBar.menuIndex === 'number') {
-                        topBar.menuIndex = navigationIndex;
+                    if (typeof topbar.menuIndex === 'number') {
+                        topbar.menuIndex = navigationIndex;
                     }
                 }}
                 onRef={(node) => {
-                    topBar.menus.current[navigationIndex] = node!;
+                    topbar.menus.current[navigationIndex] = node!;
                 }}
             />
         ); break;

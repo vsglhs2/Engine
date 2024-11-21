@@ -12,7 +12,7 @@ import { useTopBarConfig } from "./use-top-bar-config";
 
 export const Studio: FC = observer(() => {
     const project = projects.active;
-    const topBarConfig = useTopBarConfig();
+    const topbarConfig = useTopBarConfig();
     const studioConfig = useLayoutConfig();
     const { t } = useTranslation();
 
@@ -60,7 +60,7 @@ export const Studio: FC = observer(() => {
 
     return (
         <>
-            <TopBar config={topBarConfig} />
+            <TopBar config={topbarConfig} />
             <Layout config={studioConfig} />
         </>
     )

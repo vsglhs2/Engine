@@ -1,4 +1,4 @@
-export { TopBar, topBar } from "./top-bar";
+export { TopBar, topbar } from "./top-bar";
 export { project, ProjectStore } from "./project";
 export { RealmStore } from "./realm";
 export { canvas, CanvasStore } from "./canvas";

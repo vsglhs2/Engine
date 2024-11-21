@@ -9,4 +9,6 @@ export default class EmptyController implements IController {
             mouse: emptyArray,
         }
     }
+
+    destroy(): void {}
 }

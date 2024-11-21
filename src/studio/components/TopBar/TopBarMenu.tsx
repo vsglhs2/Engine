@@ -1,4 +1,4 @@
-import { topBar, TopBar } from "@/studio/stores";
+import { topbar, TopBar } from "@/studio/stores";
 import { Menu } from "@mui/joy";
 import { observer } from "mobx-react-lite";
 import { FC, KeyboardEvent } from "react";

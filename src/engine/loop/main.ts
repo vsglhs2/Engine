@@ -44,4 +44,9 @@ export default class Loop extends BaseLoop {
         this.isDone = true;
         this.prepare();
     }
+
+    public override destroy(): void {
+        this.stop();
+        super.destroy();
+    }
 }
