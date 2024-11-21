@@ -9,17 +9,17 @@ scene.load();
 const { Entities } = scene.realm;
 const { environment } = scene;
 
-const loop = new Loop({
-    fps: 120,
-    controller: new CaptureController(),
-    entities: Entities,
-    renderers: environment.renderers,
-});
-
 const root = document.querySelector('#root') as HTMLDivElement;
 const mountables = environment.renderers
     .filter(renderer => renderer instanceof MountableRenderer);
 mountables.forEach(mountable => mountable.mount(root));
+
+const loop = new Loop({
+    fps: 120,
+    controller: new CaptureController(root),
+    entities: Entities,
+    renderers: environment.renderers,
+});
 
 loop.start();
 

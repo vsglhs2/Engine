@@ -5,4 +5,5 @@ export type Captured = {
 
 export interface IController {
     toCaptured(): Captured;
+    destroy(): void;
 }

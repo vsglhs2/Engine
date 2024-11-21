@@ -1,8 +1,8 @@
-import { Box } from "@mui/joy";
-import { FC, forwardRef, HTMLAttributes, PropsWithChildren } from "react";
+import { Box, BoxProps } from "@mui/joy";
+import { forwardRef, PropsWithChildren } from "react";
 import './PageContainer.Module.scss';
 
-type PageContainerProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren;
+type PageContainerProps = BoxProps & PropsWithChildren;
 
 export const PageContainer = forwardRef<
     HTMLDivElement,
