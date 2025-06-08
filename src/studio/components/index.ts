@@ -1,7 +1,7 @@
 export { AnyConverter, JsonConverter, ObjectConverter, PrimitiveConverter } from "./Converter";
 export { Telescope } from "./Telescope";
 export { Layout } from "./Layout";
-export { TopBar } from "./TopBar";
+export { TopBar, MenuBarButton, TopBarMenu } from "./TopBar";
 export { Canvas } from "./Canvas";
 export { Explorer } from "./Explorer";
 export { Tree } from "./Tree";

@@ -47,4 +47,8 @@ export default abstract class BaseLoop {
 
         this.render();        
     }
+
+    public destroy() {
+        this.controller.destroy();
+    }
 }

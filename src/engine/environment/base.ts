@@ -12,6 +12,7 @@ export abstract class Environment {
         this.renderers = renderers;
     }
 
+    // TODO: rename or split to destroy and unmount
     destroy() {
         for (const renderer of this.renderers) {
             renderer.destroy();

@@ -21,6 +21,8 @@ function pointFromEvent(e: MouseEvent, relativeTo: HTMLElement) {
     return new Point(x, y);
 }
 
+// TODO: substitute this.locked by context store
+
 export class CanvasStore {
     public collided: Placeable[];
     public pointer: number;

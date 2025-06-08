@@ -187,30 +187,43 @@ export class SceneStore {
 
     activate(scene: Scene) {
         if (this.scene) {
-            const serialized = this.serialize();
-            // TODO: дописать
-            project.serializedRecord[this.scene.name] = serialized;
-            this.scene.destroy();            
+            this.writeSerializedState();
+            this.scene.destroy();
         }
-        this.scene = undefined;
+        this.scene = isObservableObject(scene) ? scene : makeAutoObservable(scene);
 
         // Make async later
         // await scene.load();
-        const serialized = project.serializedRecord[scene.name];
+        this.scene.load(this.realm);
+        this.restoreFromSerializedState();
+    }
 
-        scene.load(this.realm);
-        
-        if (serialized) {
-            const parsed: { entities: string[] } = JSON.parse(serialized);
-            console.log('parsed', parsed);
+    public restoreFromSerializedState(key = '') {
+        const serialized = this.readSerializedState(key);
 
-            for (const entity of parsed.entities) {
-                deserializeValue.call(this.realm, entity);
-                console.log(entity)
-            }
+        if (!serialized) return;
+
+        const parsed: { entities: string[] } = JSON.parse(serialized);
+        console.log('parsed', parsed);
+
+        for (const entity of parsed.entities) {
+            deserializeValue.call(this.realm, entity);
+            console.log(entity)
         }
+    }
 
-        this.scene = isObservableObject(scene) ? scene : makeAutoObservable(scene);
+    public writeSerializedState(key = '') {
+        const serialized = this.serialize();
+        // TODO: дописать
+        const stateKey = this.scene?.name + key;
+        project.serializedRecord[stateKey] = serialized;
+    }
+
+    public readSerializedState(key = '') {
+        const stateKey = this.scene?.name + key;
+        const serialized = project.serializedRecord[stateKey];
+
+        return serialized;
     }
 
     public serialize() {

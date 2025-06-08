@@ -3,15 +3,17 @@ import { Layout, TopBar } from "../../components";
 import './Studio.Module.scss';
 import { observer } from "mobx-react-lite";
 import { projects } from "../../stores";
-import { useStudioConfig } from "./use-studio-config";
+import { useLayoutConfig } from "./use-layout-config";
 import { Alert, PageContainer } from "@/studio/ui";
 import { useTranslation } from "react-i18next";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import Entity from "@/engine/entity/entity";
+import { useTopBarConfig } from "./use-top-bar-config";
 
 export const Studio: FC = observer(() => {
     const project = projects.active;
-    const config = useStudioConfig();
+    const topbarConfig = useTopBarConfig();
+    const studioConfig = useLayoutConfig();
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -58,8 +60,8 @@ export const Studio: FC = observer(() => {
 
     return (
         <>
-            <TopBar />
-            { project && <Layout config={config} /> }
+            <TopBar config={topbarConfig} />
+            <Layout config={studioConfig} />
         </>
     )
 });
